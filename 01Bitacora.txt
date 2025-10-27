@@ -1,0 +1,96 @@
+Bitácora de desarrollo – Proyecto Deporte Conecta
+Fecha: 23 de octubre de 2025
+Desarrollador: Sebastian García Cruz
+Proyecto: Deporte Conecta – Plataforma colaborativa de conexión deportiva
+
+Avances implementados para avance de hoy:
+
+Se realizaron mejoras significativas en la funcionalidad y experiencia del usuario,
+centradas en la interacción con el mapa y la búsqueda de ubicaciones deportivas. 
+Se consolidó la fase de geolocalización, filtrado avanzado y diseño adaptable.
+
+Principales mejoras realizadas:
+
+1. Integración del filtro "Cerca de mí" con geolocalización
+   Se implementó el uso de la API navigator.geolocation, permitiendo obtener la ubicación actual del usuario.
+   El usuario puede seleccionar manualmente un radio de búsqueda, el cual se muestra visualmente en el mapa con un círculo interactivo.
+   El filtro se integra con el tipo de deporte y el buscador de texto, mostrando solo las ubicaciones dentro del rango definido.
+   Se añadió una interfaz visual moderna para configurar ubicación y rango de búsqueda.
+
+2. Mejoras visuales en la interfaz principal
+   Se rediseñó la barra superior del mapa para hacerla más compacta y funcional, evitando que cubra gran parte del mapa.
+   Se redujo el tamaño de los campos de búsqueda y filtro de deportes para una mejor proporción visual.
+   Se realizaron ajustes responsivos para pantallas pequeñas y medianas.
+
+3. Mantenimiento y optimización de los paneles flotantes
+   Se ajustaron los estilos de los paneles "Añadir ubicación", "Cerca de mí" y "Favoritos" para mantener coherencia visual 
+   con el nuevo diseño del mapa.
+
+4. Estructura preparada para multiusuario
+   En el código del mapa (map.js) ya se utiliza un campo "createdBy", lo que permitirá vincular futuras ubicaciones con un usuario específico.
+   La base está lista para conectar el futuro sistema de usuarios y roles (usuario y administrador).
+
+
+
+Objetivos en proceso para la próxima semana – Fase de autenticación y perfiles:
+
+Durante la próxima semana se iniciará la fase demo de autenticación y gestión de usuarios, 
+que representa un paso hacia la versión comunitaria de la plataforma.
+
+Objetivo general:
+Implementar un sistema básico de inicio de sesión, registro y perfiles de usuario que permita diferenciar 
+entre usuarios y gestionar la autoría de las ubicaciones, 
+fortaleciendo el sentido de comunidad dentro de Deporte Conecta.
+
+Objetivos específicos:
+
+1. Diseñar y desarrollar la pantalla de autenticación (auth.html)
+   Permitir el registro de nuevos usuarios y acceso mediante usuario o correo electrónico.
+   Los datos se almacenarán localmente (modo demo) en localStorage con la siguiente estructura:
+
+{
+"id": "uuid",
+"username": "usuario01",
+"email": "[correo@demo.com](mailto:correo@demo.com)",
+"passwordHash": "...",
+"sportsFav": [],
+"bio": "",
+"avatar": ""
+}
+
+Creación de sesión persistente (dc_session) con identificación única del usuario activo.
+
+2. Implementar perfiles personales (profile.html)
+   Página editable para actualizar datos personales y deportivos: nombre, bio, avatar y deportes favoritos.
+   Guardado automático de la información en el almacenamiento local.
+   Visualización de "Mis ubicaciones", mostrando solo las creadas por el usuario activo.
+
+3. Perfiles públicos de usuario (user.html)
+   Visualización del perfil de otros usuarios desde los popups del mapa.
+   Mostrar información básica del creador y sus ubicaciones asociadas.
+   Botón "Ver todas las ubicaciones en el mapa".
+
+4. Control de permisos en el mapa
+   Solo el creador podrá editar o eliminar sus propias ubicaciones.
+   Todos los usuarios podrán visualizar las ubicaciones y consultar información del creador.
+   Los favoritos serán individualizados por usuario (dc_favorites_userId).
+
+5. Preparación del backend
+   Definir la estructura de conexión para migrar fácilmente a un backend real (Firebase o Supabase).
+   Crear un módulo dataService.js para manejar usuarios, ubicaciones y sesiones, facilitando el cambio a un servicio en la nube.
+
+
+
+Impacto esperado del siguiente avance:
+
+La incorporación del sistema de usuarios permitirá autenticar y personalizar el uso de la aplicación, establecer propiedad individual
+de las ubicaciones, y fomentar la interacción comunitaria al mostrar quién creó cada punto deportivo.
+Esto sentará las bases para futuras expansiones como eventos, chat entre usuarios o sistema de reputación.
+
+
+
+Conclusión:
+
+Con los avances actuales, Deporte Conecta pasa de ser una herramienta local de visualización colaborativa a una plataforma con estructura social, 
+donde cada usuario tiene identidad, control de su contenido y conexión con otros deportistas.
+El siguiente paso será la implementación del sistema de usuarios y autenticación para completar la fase demo y preparar el camino hacia la versión conectada con backend.

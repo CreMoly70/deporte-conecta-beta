@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Deporte Conecta · Mapa</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+</head>
+<body class="map-body">
+  <!-- Barra superior -->
+  <div class="top-bar">
+    <a class="back" href="index.html">← Inicio</a>
+
+    <div class="filters">
+      <label for="sportFilter">Deporte</label>
+      <select id="sportFilter" class="select">
+        <option value="">Todos</option>
+        <option>Fútbol</option>
+        <option>Baloncesto</option>
+        <option>Voleibol</option>
+        <option>Ciclismo</option>
+        <option>Atletismo</option>
+      </select>
+
+      <label for="searchText" class="sr-only">Buscar</label>
+      <input id="searchText" class="input" placeholder="Buscar por nombre o deporte..."/>
+
+      <button id="btnClear" class="button button--ghost">Limpiar</button>
+      <button id="btnAddMode" class="button button--ghost" title="Colocar marcador en el mapa">➕ Añadir</button>
+      <button id="btnFavPanel" class="button button--ghost" title="Ver favoritos">❤ Favoritos</button>
+      <button id="btnNear" class="button button--ghost" title="Filtrar lugares cerca de mí">📍 Cerca de mí</button>
+    </div>
+
+    <div class="stats" id="statsBar" aria-live="polite"></div>
+  </div>
+
+  <!-- Mapa -->
+  <div id="map" class="map"></div>
+
+  <!-- Panel flotante: Agregar ubicación -->
+  <div id="addPanel" class="floating-panel card" style="z-index:1000" hidden>
+    <h2>Agregar ubicación</h2>
+    <p id="hint" style="margin-top:0; opacity:.95; font-size:.95rem">
+      Activa <strong>“Añadir”</strong> y haz clic en el mapa para colocar el marcador. Puedes arrastrarlo antes de guardar.
+    </p>
+
+    <div class="grid2">
+      <label>Nombre
+        <input id="name" class="input" placeholder="Nombre del lugar">
+      </label>
+
+      <label>Deporte
+        <select id="sport" class="select">
+          <option>Fútbol</option><option>Baloncesto</option>
+          <option>Voleibol</option><option>Ciclismo</option>
+          <option>Atletismo</option>
+        </select>
+      </label>
+
+      <label style="grid-column:1/-1">Horario
+        <input id="hours" class="input" placeholder="Ej. 08:00 - 18:00">
+      </label>
+
+      <label style="grid-column:1/-1">Más información
+        <textarea id="more" class="input" rows="3" placeholder="Detalles: materiales, aforo, estado, costo, contacto, etc."></textarea>
+      </label>
+    </div>
+
+    <div class="form-buttons">
+      <button class="button button--ghost" id="btnCancelAdd">Cancelar</button>
+      <button class="button" id="btnSave">Guardar</button>
+    </div>
+  </div>
+
+  <!-- Panel lateral: Favoritos -->
+  <aside id="favPanel" class="side-panel card" hidden>
+    <div class="side-head">
+      <strong>❤ Favoritos</strong>
+      <button id="favClose" class="button button--ghost" title="Cerrar">Cerrar</button>
+    </div>
+    <div id="favList" class="side-list"></div>
+  </aside>
+
+  <!-- Panel pequeño: Cerca de mí -->
+  <div id="nearPanel" class="near-panel card" hidden>
+    <div class="near-row">
+      <strong>📍 Cerca de mí</strong>
+      <button id="nearClose" class="button button--ghost" title="Cerrar">Cerrar</button>
+    </div>
+    <div class="near-row">
+      <button id="nearUseGeo" class="button button--ghost" title="Usar mi ubicación del navegador">Usar mi ubicación</button>
+      <button id="nearPickOnMap" class="button button--ghost" title="Elegir punto en el mapa">Elegir en el mapa</button>
+    </div>
+    <div class="near-row">
+      <label style="flex:1">Radio (km)
+        <input id="nearRange" class="input" type="range" min="0.2" max="20" step="0.1" value="3">
+      </label>
+      <input id="nearRangeNum" class="input" type="number" min="0.2" max="20" step="0.1" value="3" style="width:90px">
+    </div>
+    <div class="near-row" style="justify-content:flex-end; gap:8px">
+      <button id="nearClear" class="button button--ghost">Limpiar</button>
+      <button id="nearApply" class="button">Aplicar</button>
+    </div>
+    <small id="nearStatus" style="opacity:.85"></small>
+  </div>
+
+  <!-- Modal de Información -->
+  <div id="infoModal" class="modal" hidden>
+    <div class="modal-backdrop" data-close="1"></div>
+    <div class="modal-card card">
+      <div class="modal-head">
+        <h3 id="infoTitle">Información del lugar</h3>
+        <button class="button button--ghost" id="infoClose">Cerrar</button>
+      </div>
+      <div id="infoBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="js/map.js"></script>
+</body>
+</html>

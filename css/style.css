@@ -1,0 +1,347 @@
+/* === Deporte Conecta · Estilos unificados === */
+:root{
+  --c-grad-a: #2ecc71;
+  --c-grad-b: #3498db;
+  --c-card: rgba(255,255,255,0.06);
+  --c-border: rgba(255,255,255,0.12);
+  --c-text: #ffffff;
+  --c-text-dim: #d8e6eb;
+  --c-primary: #2ecc71;
+  --c-secondary: #2aa3ff;
+  --radius: 16px;
+  --shadow: 0 10px 30px rgba(0,0,0,.25);
+
+  /* Panel más visible */
+  --panel-bg: rgba(12, 18, 28, 0.90);
+  --panel-border: rgba(255,255,255,0.22);
+  --panel-shadow: 0 18px 50px rgba(0,0,0,0.45);
+  --panel-blur: 12px;
+
+  /* Modal */
+  --modal-backdrop: rgba(0,0,0,.55);
+}
+
+*{ box-sizing:border-box }
+html,body{ height:100% }
+body{
+  margin:0; color:var(--c-text);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: linear-gradient(135deg, var(--c-grad-a), var(--c-grad-b));
+  min-height:100%;
+}
+
+.header-small{ text-align:center; padding:24px 16px }
+.header-small .back{ position:absolute; left:16px; top:20px; color:#fff; text-decoration:none; opacity:.9 }
+
+.card{
+  background: var(--c-card);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(6px);
+}
+
+.button{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:.75rem 1rem; border-radius:14px; border:none;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-secondary));
+  color:#05201a; font-weight:700; cursor:pointer; text-decoration:none;
+  transition: transform .12s ease, filter .18s ease; box-shadow: var(--shadow);
+}
+.button:hover{ transform: translateY(-1px); filter: brightness(1.05) }
+.button--ghost{ background:transparent; color:#fff; border:1px solid var(--c-border); box-shadow:none }
+
+.input,.select{
+  width:100%; padding:.7rem .9rem; border-radius:12px; border:1px solid var(--c-border);
+  background: rgba(0,0,0,.25); color:#fff; outline:none;
+}
+.input:focus,.select:focus{ border-color:#7fd6ff; box-shadow:0 0 0 3px rgba(42,163,255,.25) }
+
+/* Menú principal */
+.menu-container{
+  display:grid; gap:20px; grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+  padding:24px;
+}
+.menu-card{ background:var(--c-card); border:1px solid var(--c-border); border-radius:var(--radius); padding:20px }
+.menu-card h3{ margin:0 0 8px }
+.menu-card p{ margin:0 0 16px; color:var(--c-text-dim) }
+
+/* Mapa */
+.map-body{ height:100vh; display:flex; flex-direction:column }
+
+/* ——— Barra superior compacta ——— */
+.top-bar{
+  display:flex; gap:8px; align-items:center; justify-content:space-between;
+  padding:6px 12px;                     /* ↓ menos alto */
+  background: linear-gradient(90deg, rgba(13,179,127,.9), rgba(42,163,255,.9));
+  backdrop-filter: blur(6px);
+  border-bottom:1px solid var(--c-border);
+}
+.top-bar .back{ color:#fff; text-decoration:none; font-weight:600; font-size:.95rem }
+.top-bar .filters{
+  display:flex; gap:6px; align-items:center; flex-wrap:wrap;
+  flex:1; min-width:0;
+}
+/* Inputs y select más cortos dentro de la barra */
+.top-bar .select,
+.top-bar .input{
+  padding:.5rem .7rem;
+  border-radius:10px;
+  background: rgba(0,0,0,.2);
+  font-size:.9rem;
+  flex:1 1 140px;            /* base más corta */
+  max-width:200px;           /* límite de ancho */
+}
+.top-bar #searchText{
+  flex:2 1 200px;            /* buscador un poco más ancho */
+  max-width:260px;           /* límite para que no se haga enorme */
+}
+.top-bar .button{
+  padding:.55rem .8rem;      /* botones más compactos */
+  border-radius:10px;
+  font-size:.88rem;
+}
+
+.sr-only{ position:absolute; left:-9999px }
+.map{ flex:1; min-height:60vh }
+
+/* Panel flotante (visible solo cuando se abre) */
+.floating-panel{
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  max-width: 520px;
+  z-index: 1000;
+  background: var(--panel-bg);
+  color: #f4fbff;
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--panel-shadow);
+  backdrop-filter: blur(var(--panel-blur));
+}
+.floating-panel h2{ margin:0 0 10px; font-size:1.35rem; text-shadow:0 1px 0 rgba(0,0,0,.25) }
+.floating-panel p{ margin:6px 0 14px; color:#cfe5f0 }
+.floating-panel .input,.floating-panel .select{
+  background: rgba(255,255,255,0.11);
+  border:1px solid rgba(255,255,255,0.22);
+}
+.floating-panel .input::placeholder{ color: rgba(255,255,255,0.7) }
+.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px }
+.grid2 label{ display:flex; flex-direction:column; gap:6px; font-size:.95rem }
+.form-buttons{ display:flex; gap:10px; justify-content:flex-end; margin-top:10px }
+
+/* Modal de información */
+.modal[hidden]{ display:none }
+.modal{ position:fixed; inset:0; z-index:1100; display:flex; align-items:center; justify-content:center }
+.modal-backdrop{ position:absolute; inset:0; background: var(--modal-backdrop) }
+.modal-card{
+  position:relative; width:min(720px, calc(100% - 32px));
+  background: rgba(12,18,28,.92); border:1px solid rgba(255,255,255,.2);
+  border-radius:16px; padding:16px; box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  backdrop-filter: blur(10px); z-index:1;
+}
+.modal-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px }
+.modal-body p{ margin:.35rem 0; color:#e9f6ff }
+
+/* Responsive */
+@media (max-width:900px){
+  .top-bar{ flex-wrap:wrap; gap:8px }
+  .top-bar .filters{ flex:1 1 100%; flex-wrap:wrap }
+}
+@media (max-width:640px){
+  .floating-panel{ left:16px; right:16px; max-width:none }
+}
+
+/* === Corrección de MODAL (scroll + visibilidad botón Cerrar) === */
+.modal[hidden]{ display:none; }
+.modal{
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+.modal-backdrop{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 0;
+}
+.modal-card{
+  position: relative;
+  width: min(720px, 95%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: rgba(12,18,28,.94);
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 16px;
+  padding: 20px 18px 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  backdrop-filter: blur(10px);
+  z-index: 1;
+  color: #f4fbff;
+}
+.modal-head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  position: sticky;
+  top: 0;
+  background: rgba(12,18,28,.94);
+  padding-top: 5px;
+  padding-bottom: 8px;
+  z-index: 5;
+}
+#infoClose{
+  flex-shrink: 0;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 6px 12px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+}
+#infoClose:hover{
+  background: rgba(255,255,255,0.25);
+  transform: none;
+}
+.modal-body{
+  overflow-y: auto;
+  max-height: calc(90vh - 80px);
+  padding-right: 4px;
+}
+
+/* === Estilo del popup de Leaflet (panel de ubicación) === */
+.leaflet-popup-content-wrapper{
+  border-radius: 16px !important;
+  border: 1px solid rgba(255,255,255,.25);
+  box-shadow: 0 16px 40px rgba(0,0,0,.35);
+  background: rgba(12,18,28,.95) !important;
+  backdrop-filter: blur(10px);
+  color: #f4fbff;
+}
+.leaflet-popup-tip{
+  background: rgba(12,18,28,.95) !important;
+  border: 1px solid rgba(255,255,255,.25);
+}
+.leaflet-popup-content{
+  margin: 14px 16px 16px 16px !important;
+}
+.popup{
+  min-width: 260px;
+}
+.popup-title{
+  margin: 0 0 6px 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: .2px;
+  color: #fff;
+}
+.popup-meta{
+  font-size: .92rem;
+  color: #d7ebf7;
+}
+.popup-meta small{
+  display:block;
+  margin: 2px 0;
+  opacity: .9;
+}
+.popup-actions{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+}
+.popup-actions .left,
+.popup-actions .right{
+  display: flex;
+  gap: 8px;
+}
+.popup .button{
+  padding: .5rem .75rem;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: none;
+}
+.popup .button--ghost{
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.2);
+}
+.popup .button--ghost:hover{
+  background: rgba(255,255,255,.2);
+}
+
+/* ===== Panel lateral de Favoritos ===== */
+.side-panel[hidden]{ display:none }
+.side-panel{
+  position: fixed;
+  left: 16px;
+  top: 80px;
+  bottom: 16px;
+  width: 360px;
+  z-index: 1000;
+  background: rgba(12, 18, 28, 0.94);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 16px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.45);
+  backdrop-filter: blur(12px);
+  display: flex; flex-direction: column;
+}
+.side-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 12px; border-bottom: 1px solid rgba(255,255,255,.15);
+}
+.side-list{
+  padding: 8px 12px; overflow-y: auto; flex: 1;
+}
+.side-item{
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 12px; padding: 10px; margin-bottom: 10px;
+  background: rgba(255,255,255,.05);
+}
+.side-item h4{ margin:0 0 6px; font-size:1rem }
+.side-item small{ display:block; opacity:.85 }
+.side-actions{ display:flex; gap:8px; margin-top:8px; flex-wrap:wrap }
+.side-actions .button{ padding:.5rem .75rem; border-radius:10px; box-shadow:none }
+
+/* ===== Panel "Cerca de mí" ===== */
+.near-panel[hidden]{ display:none }
+.near-panel{
+  position: fixed;
+  right: 16px;
+  top: 76px;
+  width: 380px;
+  z-index: 1000;
+  background: rgba(12, 18, 28, 0.94);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 16px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.45);
+  backdrop-filter: blur(12px);
+  padding: 12px;
+}
+.near-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+  justify-content:space-between;
+}
+.near-panel .input{
+  background: rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.22);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px){
+  .side-panel{ width: calc(100% - 32px); left:16px; right:16px; top: 76px; }
+  .near-panel{ width: calc(100% - 32px); left:16px; right:16px; top: 76px;}
+}
+@media (max-width: 640px){
+  .floating-panel{ left:16px; right:16px; max-width:none }
+}

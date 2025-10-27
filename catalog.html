@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Deporte Conecta · Catálogo</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header-small">
+    <a href="index.html" class="back" aria-label="Volver al inicio">← Volver</a>
+    <h1>Catálogo de deportes</h1>
+  </header>
+
+  <main class="catalog">
+    <!-- Fútbol -->
+    <article class="card">
+      <h3>Fútbol</h3>
+      <p>Deporte de equipo más popular. Ideal para resistencia, coordinación y trabajo en grupo.</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap">
+        <button class="button" data-sport="Fútbol" data-action="map">Ver lugares en el mapa</button>
+        <button class="button button--ghost" data-sport="Fútbol" data-action="info">Información</button>
+      </div>
+    </article>
+
+    <!-- Baloncesto -->
+    <article class="card">
+      <h3>Baloncesto</h3>
+      <p>Mejora salto, agilidad y táctica. Excelente para grupos pequeños.</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap">
+        <button class="button" data-sport="Baloncesto" data-action="map">Ver lugares en el mapa</button>
+        <button class="button button--ghost" data-sport="Baloncesto" data-action="info">Información</button>
+      </div>
+    </article>
+
+    <!-- Voleibol -->
+    <article class="card">
+      <h3>Voleibol</h3>
+      <p>Trabajo en equipo, reflejos y coordinación. Versiones playa e indoor.</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap">
+        <button class="button" data-sport="Voleibol" data-action="map">Ver lugares en el mapa</button>
+        <button class="button button--ghost" data-sport="Voleibol" data-action="info">Información</button>
+      </div>
+    </article>
+
+    <!-- Ciclismo -->
+    <article class="card">
+      <h3>Ciclismo</h3>
+      <p>Carretera o montaña. Resistencia y exploración de rutas.</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap">
+        <button class="button" data-sport="Ciclismo" data-action="map">Ver lugares en el mapa</button>
+        <button class="button button--ghost" data-sport="Ciclismo" data-action="info">Información</button>
+      </div>
+    </article>
+
+    <!-- Atletismo -->
+    <article class="card">
+      <h3>Atletismo</h3>
+      <p>Carreras, saltos y lanzamientos. Disciplina y desarrollo físico completo.</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap">
+        <button class="button" data-sport="Atletismo" data-action="map">Ver lugares en el mapa</button>
+        <button class="button button--ghost" data-sport="Atletismo" data-action="info">Información</button>
+      </div>
+    </article>
+  </main>
+
+  <!-- Modal de Información -->
+  <div id="infoModal" class="modal" hidden>
+    <div class="modal-backdrop" data-close="1"></div>
+    <div class="modal-card card">
+      <div class="modal-head">
+        <h3 id="infoTitle">Información del deporte</h3>
+        <button class="button button--ghost" id="infoClose">Cerrar</button>
+      </div>
+      <div id="infoBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <footer>Proyecto de Investigación - Sebastián García Cruz</footer>
+  <script src="js/catalog.js"></script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1,
+    "name": "Cancha Central de Ricaurte",
+    "lat": 4.3085,
+    "lng": -76.2094,
+    "schedule": {
+      "fútbol": "16:00 - 21:00",
+      "voleibol": "08:00 - 12:00"
+    },
+    "public": true
+  },
+  {
+    "id": 2,
+    "name": "coliseo de Robledo",
+    "lat": 4.2531,
+    "lng": -76.2279,
+    "schedule": {
+      "Futbol (sala)": "17:00 - 19:00",
+      "voleibol": "19:30 - 22:30"
+    },
+    "public": true
+  },
+  {
+    "id": 3,
+    "name": "Cancha Huasano",
+    "lat": 4.2462,
+    "lng": -76.2448,
+    "schedule": {
+      "fútbol": "15:00 - 17:30",
+      "voleibol": "09:00 - 11:030"
+    },
+    "public": true
+  },
+  {
+    "id": 4,
+    "name": "Zona Deportiva Rural A",
+    "lat": 4.3889,
+    "lng": -76.0752,
+    "schedule": {
+      "béisbol": "08:00 - 18:00",
+      "atletismo": "06:00 - 09:00"
+    },
+    "public": false
+  },
+  {
+    "id": 5,
+    "name": "Cancha Los Álamos",
+    "lat": 4.3901,
+    "lng": -76.0769,
+    "schedule": {
+      "fútbol": "09:00 - 21:00",
+      "baloncesto": "10:00 - 18:00"
+    },
+    "public": true
+  },
+  {
+    "id": 6,
+    "name": "Polideportivo Norte",
+    "lat": 4.3717,
+    "lng": -76.0708,
+    "schedule": {
+      "voleibol": "08:00 - 20:00",
+      "tenis": "09:00 - 19:00"
+    },
+    "public": false
+  },
+  {
+    "id": 7,
+    "name": "coliseo La Herradura",
+    "lat": 4.2798,
+    "lng": -76.2172,
+    "schedule": {
+      "baloncesto": "21:00 - 22:00",
+      "fútbol": "16:00 - 21:00"
+    },
+    "public": false
+  },
+  {
+    "id": 8,
+    "name": "Coliseo Ricaurte",
+    "lat": 4.3368,
+    "lng": -76.1872,
+    "schedule": {
+      "voleibol": "10:00 - 12:00",
+      "Futbol (sala)": "19:00 - 22:00"
+    },
+    "public": true
+  }
+]
