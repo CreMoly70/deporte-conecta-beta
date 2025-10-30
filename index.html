@@ -1,37 +1,215 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Deporte Conecta · Inicio</title>
-  <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Deporte Conecta</title>
+
+  <!-- Tus estilos globales -->
+  <link rel="stylesheet" href="css/style.css"/>
+
+  <!-- Estilos específicos solo para la home -->
+  <style>
+    /* Paleta más equilibrada para la home */
+    :root{
+      --home-grad-a: #6fb3ff;   /* azul suave */
+      --home-grad-b: #8b7bff;   /* lila frío */
+      --home-accent: #ff8364;   /* coral deportivo */
+      --home-bg: linear-gradient(135deg, var(--home-grad-a), var(--home-grad-b));
+      --home-card: rgba(255,255,255,0.10);
+      --home-border: rgba(255,255,255,0.18);
+      --home-shadow: 0 10px 30px rgba(20,30,60,.25);
+    }
+
+    body.home {
+      background: var(--home-bg);
+      color:#f7fbff;
+    }
+
+    /* Contenedor general */
+    .home-wrap{
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 40px 18px 56px;
+    }
+
+    /* Hero */
+    .hero{
+      text-align:center;
+      margin-bottom: 26px;
+    }
+    .hero h1{
+      margin:0 0 8px 0;
+      font-size: clamp(28px, 4vw, 44px);
+      letter-spacing:.2px;
+    }
+    .hero p{
+      margin:0 auto;
+      max-width: 720px;
+      opacity:.95;
+      font-size: clamp(14px, 2.2vw, 18px);
+    }
+
+    /* Tarjetas */
+    .home-grid{
+      margin-top: 28px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    @media (max-width: 980px){
+      .home-grid{ grid-template-columns: 1fr; max-width: 680px; margin-inline:auto; }
+    }
+
+    .card-home{
+      background: var(--home-card);
+      border:1px solid var(--home-border);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: var(--home-shadow);
+      backdrop-filter: blur(8px);
+      transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .card-home:hover{
+      transform: translateY(-3px);
+      box-shadow: 0 16px 40px rgba(20,30,60,.35);
+      border-color: rgba(255,255,255,.28);
+    }
+
+    /* Encabezado de tarjeta */
+    .card-head{
+      display:flex; align-items:center; gap:12px;
+      margin-bottom: 10px;
+    }
+    .card-icon{
+      width: 40px; height: 40px; flex: 0 0 40px;
+      border-radius: 12px;
+      display:grid; place-items:center;
+      background: rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.25);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
+      font-size: 22px;
+    }
+    .card-title{
+      font-weight: 800; font-size: 1.15rem; letter-spacing:.2px; margin:0;
+    }
+    .card-body{
+      color:#e7f2ff; opacity:.95; font-size: .98rem; line-height:1.45;
+      min-height: 72px;
+    }
+
+    /* Botones de acción con estilo más estético */
+    .btn{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:.70rem 1rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.10);
+      color:#fff; text-decoration:none; font-weight:700;
+      transition: transform .12s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+      box-shadow: 0 6px 18px rgba(0,0,0,.18);
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.32) }
+
+    .btn-primary{
+      background: linear-gradient(135deg, var(--home-accent), #ff9d7e);
+      color:#201a1a;
+      border: none;
+      box-shadow: 0 10px 26px rgba(255,131,100,.35);
+    }
+    .btn-primary:hover{
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost{ background: rgba(255,255,255,.10) }
+
+    /* Badges y estados */
+    .badge{
+      display:inline-block;
+      padding:.35rem .6rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.24);
+      font-size:.85rem; font-weight:700;
+    }
+
+    /* Pie simple */
+    .home-foot{
+      margin-top: 28px;
+      text-align: left;
+      opacity:.9;
+      font-size:.95rem;
+    }
+
+    /* Microdecoraciones sutiles en las tarjetas */
+    .card-home::after{
+      content:"";
+      position:absolute; inset:auto -40% -60% auto;
+      width:200px; height:200px; border-radius:50%;
+      background: radial-gradient(closest-side, rgba(255,255,255,.16), transparent 70%);
+      transform: rotate(15deg);
+      pointer-events:none;
+    }
+  </style>
 </head>
-<body>
-  <header class="header-small">
-    <h1>Deporte Conecta</h1>
-    <p>Conecta con tu pasión. Descubre lugares, crea encuentros y comparte deporte.</p>
-  </header>
+<body class="home">
 
-  <main class="menu-container" aria-label="Menú principal">
-    <section class="menu-card">
-      <h3>🗺️ Mapa colaborativo</h3>
-      <p>Explora y agrega ubicaciones deportivas por disciplina y horario.</p>
-      <a class="button" href="map.html" aria-label="Ir al mapa colaborativo">Abrir mapa</a>
+  <main class="home-wrap">
+    <!-- Hero -->
+    <header class="hero">
+      <h1>Deporte Conecta</h1>
+      <p>
+        Conecta con tu pasión. Descubre lugares, crea encuentros y comparte deporte.
+      </p>
+    </header>
+
+    <!-- Tarjetas principales -->
+    <section class="home-grid" aria-label="Secciones principales">
+      <!-- Mapa -->
+      <article class="card-home">
+        <div class="card-head">
+          <div class="card-icon" aria-hidden="true">🗺️</div>
+          <h2 class="card-title">Mapa colaborativo</h2>
+        </div>
+        <p class="card-body">
+          Explora y agrega ubicaciones deportivas por disciplina y horario. Filtra, guarda favoritos y descubre lugares cerca de ti.
+        </p>
+        <a class="btn btn-primary" href="map.html" aria-label="Abrir mapa colaborativo">Abrir mapa</a>
+      </article>
+
+      <!-- Catálogo -->
+      <article class="card-home">
+        <div class="card-head">
+          <div class="card-icon" aria-hidden="true">📚</div>
+          <h2 class="card-title">Catálogo de deportes</h2>
+        </div>
+        <p class="card-body">
+          Conoce cada disciplina: reglas básicas, consejos, beneficios y lugares disponibles en tu zona.
+        </p>
+        <a class="btn btn-ghost" href="catalog.html" aria-label="Ver catálogo de deportes">Ver catálogo</a>
+      </article>
+
+      <!-- Comunidad (próx.) -->
+      <article class="card-home">
+        <div class="card-head">
+          <div class="card-icon" aria-hidden="true">🤝</div>
+          <h2 class="card-title">Comunidad</h2>
+        </div>
+        <p class="card-body">
+          Conecta con personas que practican lo mismo que tú. Organiza encuentros y comparte tu progreso.
+        </p>
+        <span class="badge" title="Disponible próximamente">Próximamente</span>
+      </article>
     </section>
 
-    <section class="menu-card">
-      <h3>📚 Catálogo de deportes</h3>
-      <p>Conoce más sobre cada disciplina, reglas, tips y beneficios.</p>
-      <a class="button" href="catalog.html" aria-label="Ver catálogo de deportes">Ver catálogo</a>
-    </section>
-
-    <section class="menu-card">
-      <h3>🤝 Comunidad</h3>
-      <p>Conecta con personas que practican tu mismo deporte (próximamente).</p>
-      <button class="button button--ghost" disabled aria-disabled="true">Próximamente</button>
-    </section>
+    <!-- Pie -->
+    <footer class="home-foot">
+      Proyecto de Investigación – Sebastián García Cruz
+    </footer>
   </main>
 
-  <footer>Proyecto de Investigación - Sebastián García Cruz</footer>
 </body>
 </html>
