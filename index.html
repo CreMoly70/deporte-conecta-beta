@@ -5,8 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Deporte Conecta</title>
 
-  <!-- Tus estilos globales -->
+  <!-- Estilos globales -->
   <link rel="stylesheet" href="css/style.css"/>
+
+  <!-- DataService para validar sesión -->
+  <script src="js/dataService.js"></script>
+  <script>
+    // Redirección a login si no hay sesión + saludo
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!DS.isLoggedIn()) {
+        location.href = 'auth.html';
+        return;
+      }
+      const userId = DS.getSessionUserId();
+      const user = DS.getUserById(userId);
+      const name = (user?.name || user?.username || 'Usuario');
+      const el = document.getElementById('welcomeName');
+      if (el) el.textContent = name;
+    });
+  </script>
 
   <!-- Estilos específicos solo para la home -->
   <style>
@@ -25,6 +42,17 @@
       background: var(--home-bg);
       color:#f7fbff;
     }
+
+    /* Barra superior mínima (saludo + logout) */
+    .top-mini{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; padding:10px 14px;
+      background: linear-gradient(90deg, rgba(111,179,255,.92), rgba(139,123,255,.92));
+      border-bottom:1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(8px);
+    }
+    .top-mini .greet{ font-weight:700; letter-spacing:.2px }
+    .btn-logout{ padding:.45rem .75rem; border-radius:10px; }
 
     /* Contenedor general */
     .home-wrap{
@@ -157,6 +185,12 @@
 </head>
 <body class="home">
 
+  <!-- Barra mini con saludo + logout -->
+  <div class="top-mini">
+    <div class="greet">Bienvenido, <span id="welcomeName">Usuario</span></div>
+    <button id="btnLogout" class="button button--ghost btn-logout">Cerrar sesión</button>
+  </div>
+
   <main class="home-wrap">
     <!-- Hero -->
     <header class="hero">
@@ -211,5 +245,12 @@
     </footer>
   </main>
 
+  <script>
+    // Cerrar sesión
+    document.getElementById('btnLogout')?.addEventListener('click', () => {
+      DS.clearSession();
+      location.href = 'auth.html';
+    });
+  </script>
 </body>
 </html>

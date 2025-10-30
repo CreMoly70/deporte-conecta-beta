@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Deporte Conecta — Mi perfil</title>
+
+  <link rel="stylesheet" href="css/style.css"/>
+
+  <!-- DataService: sesión y usuarios -->
+  <script src="js/dataService.js"></script>
+  <script>
+    // Guardia de acceso: si no hay sesión, ir a auth
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!DS.isLoggedIn()) {
+        location.href = 'auth.html';
+        return;
+      }
+    });
+  </script>
+
+  <style>
+    /* Estilos locales coherentes con tu línea visual */
+    .profile-wrap{
+      max-width: 1080px; margin: 20px auto; padding: 16px;
+    }
+    .top-mini{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; padding:10px 14px;
+      background: linear-gradient(90deg, rgba(111,179,255,.92), rgba(139,123,255,.92));
+      border-bottom:1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(8px);
+    }
+    .top-mini .left{ display:flex; align-items:center; gap:10px }
+    .top-mini a{ color:#fff; text-decoration:none; font-weight:600 }
+    .btn-logout{ padding:.45rem .75rem; border-radius:10px; }
+
+    .grid{
+      display:grid; grid-template-columns: 1.2fr .8fr; gap:16px; margin-top:16px;
+    }
+    @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
+
+    .card{
+      background: var(--panel-bg);
+      border:1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: var(--panel-shadow);
+      backdrop-filter: blur(var(--panel-blur));
+    }
+    .card h2{ margin:0 0 10px; }
+    .muted{ color:#cfe5f0; opacity:.9 }
+    .row{ display:grid; gap:10px; margin-bottom:10px }
+    .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px }
+    .small{ font-size:.9rem; opacity:.9 }
+    .pill{
+      display:inline-block; padding:.35rem .6rem; border-radius:999px;
+      background: rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.22);
+      font-size:.85rem; margin: 2px 6px 2px 0;
+    }
+
+    .avatar{
+      width: 88px; height: 88px; border-radius: 18px; object-fit: cover;
+      border:1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.08);
+    }
+    .avatar-row{ display:flex; align-items:center; gap:12px }
+
+    .list{
+      display:grid; gap:10px; margin-top:10px;
+    }
+    .item{
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      border-radius: 12px;
+      padding: 10px;
+      display:grid; gap:6px;
+    }
+    .item-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .item-actions{ display:flex; gap:8px; flex-wrap:wrap }
+    .item small{ opacity:.9 }
+  </style>
+</head>
+<body>
+
+  <!-- Barra mini -->
+  <header class="top-mini">
+    <div class="left">
+      <a href="index.html">← Menú</a>
+      <strong>Mi perfil</strong>
+    </div>
+    <div class="right">
+      <span id="helloUser" class="small">Hola, Usuario</span>
+      <button id="btnLogout" class="button button--ghost btn-logout">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <main class="profile-wrap">
+    <section class="grid">
+      <!-- PERFIL -->
+      <article class="card">
+        <h2>Datos de perfil</h2>
+        <p class="muted">Actualiza tu información pública. Los demás podrán ver tu nombre, ciudad y deportes favoritos.</p>
+
+        <div class="avatar-row">
+          <img id="avatarImg" class="avatar" alt="Tu avatar"/>
+          <div>
+            <label class="small">
+              <span>Cambiar avatar</span>
+              <input id="avatarInput" type="file" accept="image/*" class="input" style="padding:.4rem"/>
+            </label>
+            <p class="small">Se guardará localmente (fase demo).</p>
+          </div>
+        </div>
+
+        <div class="row2" style="margin-top:10px">
+          <label>
+            <span>Nombre para mostrar</span>
+            <input id="name" class="input" placeholder="Tu nombre"/>
+          </label>
+          <label>
+            <span>Usuario</span>
+            <input id="username" class="input" placeholder="usuario" />
+          </label>
+        </div>
+
+        <div class="row2">
+          <label>
+            <span>Email</span>
+            <input id="email" class="input" type="email" placeholder="correo@ejemplo.com"/>
+          </label>
+          <label>
+            <span>Ciudad</span>
+            <input id="city" class="input" placeholder="Tu ciudad"/>
+          </label>
+        </div>
+
+        <div class="row">
+          <label>
+            <span>Biografía</span>
+            <textarea id="bio" class="input" rows="3" placeholder="Cuéntanos brevemente sobre ti…"></textarea>
+          </label>
+        </div>
+
+        <div class="row">
+          <label>
+            <span>Deportes favoritos</span>
+            <select id="sportsFav" class="select" multiple size="6" title="Selecciona uno o más">
+              <option>Fútbol</option>
+              <option>Baloncesto</option>
+              <option>Voleibol</option>
+              <option>Ciclismo</option>
+              <option>Running</option>
+              <option>Natación</option>
+              <option>Tenis</option>
+              <option>Gym</option>
+            </select>
+          </label>
+          <div id="sportsPreview" class="small"></div>
+        </div>
+
+        <div class="form-buttons">
+          <button id="btnSaveProfile" class="button">Guardar cambios</button>
+        </div>
+      </article>
+
+      <!-- MIS UBICACIONES -->
+      <article class="card">
+        <h2>Mis ubicaciones</h2>
+        <p class="muted">Lugares añadidos por ti. Solo tú puedes eliminarlos.</p>
+
+        <div id="myStats" class="small" style="margin:8px 0"></div>
+        <div id="myPlaces" class="list"></div>
+      </article>
+    </section>
+  </main>
+
+  <script src="js/profile.js"></script>
+  <script>
+    // Cerrar sesión
+    document.getElementById('btnLogout')?.addEventListener('click', () => {
+      DS.clearSession();
+      location.href = 'auth.html';
+    });
+  </script>
+</body>
+</html>

@@ -1,61 +1,53 @@
-// Deporte Conecta · Mapa colaborativo con Leaflet + localStorage (versión estable)
+// Deporte Conecta · Mapa colaborativo con Leaflet + localStorage (v sesión de usuario)
 const LS_KEYS = {
   LOCATIONS: 'dc_locations',
-  FAVORITES: 'dc_favorites',      // set de ids (se migra a por-usuario más adelante)
+  FAVORITES: 'dc_favorites',      // base de favoritos
   PREF_SPORT: 'dc_pref_sport',
-  PREF_SEARCH: 'dc_pref_search',
-  DEVICE_ID: 'dc_device_id'
+  PREF_SEARCH: 'dc_pref_search'
 };
 
 let map;
 let allMarkers = [];
 let currentData = [];
-let addMode = false;     // modo colocar marcador
-let tempMarker = null;   // marcador temporal (draggable)
-let tempLatLng = null;   // coords elegidas
-let nearCircle = null;   // círculo de "cerca de mí"
+let addMode = false;
+let tempMarker = null;
+let tempLatLng = null;
+let nearCircle = null;
+let nearCenterMarker = null;
+let selectingCenter = false;
 
 // ============= Boot =============
 document.addEventListener('DOMContentLoaded', () => {
-  ensureDeviceId();
+  if (!DS.isLoggedIn()) {
+    location.href = 'auth.html';
+    return;
+  }
 
-  // Mapa
+  // Mapa base
   map = L.map('map').setView([4.65, -74.1], 12);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
   }).addTo(map);
 
-  // Datos
+  // Datos iniciales
   const stored = readLS(LS_KEYS.LOCATIONS, []);
-  if (stored.length) {
-    currentData = stored.map(normalize);
-    render();
-  } else {
-    fetch('data/places.json').then(r => r.ok ? r.json() : [])
-      .catch(() => [])
-      .then(seed => {
-        currentData = Array.isArray(seed) ? seed.map(normalize) : [];
-        saveLS(LS_KEYS.LOCATIONS, currentData);
-        render();
-      });
-  }
+  currentData = (stored || []).map(normalize);
+  render();
 
   // Prefiltros
   const preSport = readLS(LS_KEYS.PREF_SPORT, '');
   if (preSport) byId('sportFilter').value = preSport;
   byId('searchText').value = readLS(LS_KEYS.PREF_SEARCH, '');
 
-  // UI listeners
+  // Eventos UI
   byId('sportFilter').addEventListener('change', () => { persistPrefs(); render(); });
   byId('searchText').addEventListener('input', debounce(() => { persistPrefs(); render(); }, 120));
   byId('btnClear').addEventListener('click', clearFilters);
 
-  // Añadir ubicación
   byId('btnAddMode').addEventListener('click', toggleAddMode);
   byId('btnCancelAdd').addEventListener('click', () => setAddMode(false));
   byId('btnSave').addEventListener('click', saveLocation);
 
-  // Click en mapa para colocar/ajustar marcador temporal
   map.on('click', (e) => {
     if (!addMode) return;
     const { lat, lng } = e.latlng;
@@ -63,24 +55,19 @@ document.addEventListener('DOMContentLoaded', () => {
     ensureTempMarkerAt(lat, lng, true);
   });
 
-  // Modal Información
   byId('infoClose').addEventListener('click', hideInfo);
   const mb = qs('#infoModal .modal-backdrop');
   if (mb) mb.addEventListener('click', (e) => { if (e.target.dataset.close !== undefined || e.target === mb) hideInfo(); });
 
-  // Favoritos (panel lateral)
   byId('btnFav').addEventListener('click', openFavPanel);
   byId('btnCloseFav').addEventListener('click', closeFavPanel);
 
-  // Cerca de mí (si lo usas)
-  const btnNear = byId('btnNear');
-  if (btnNear) {
-    btnNear.addEventListener('click', () => byId('nearPanel').hidden = false);
-    byId('btnCloseNear').addEventListener('click', () => byId('nearPanel').hidden = true);
-    byId('btnNearClear').addEventListener('click', () => { if (nearCircle) { map.removeLayer(nearCircle); nearCircle = null; } render(); });
-    byId('btnNearLocate').addEventListener('click', locateMe);
-    byId('btnNearApply').addEventListener('click', applyNearFilter);
-  }
+  byId('btnNear').addEventListener('click', () => byId('nearPanel').hidden = false);
+  byId('btnCloseNear').addEventListener('click', () => byId('nearPanel').hidden = true);
+  byId('btnNearClear').addEventListener('click', clearNear);
+  byId('btnNearLocate').addEventListener('click', locateMe);
+  byId('btnNearSelect').addEventListener('click', startSelectNearCenter);
+  byId('btnNearApply').addEventListener('click', applyNearFilter);
 });
 
 // ============= Helpers =============
@@ -88,16 +75,6 @@ function byId(id){ return document.getElementById(id); }
 function qs(sel){ return document.querySelector(sel); }
 function readLS(k, def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def }catch{ return def } }
 function saveLS(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
-
-function ensureDeviceId(){
-  let id = localStorage.getItem(LS_KEYS.DEVICE_ID);
-  if(!id){
-    id = (crypto?.randomUUID?.() || String(Date.now()) + Math.random().toString(16).slice(2));
-    localStorage.setItem(LS_KEYS.DEVICE_ID, id);
-  }
-  return id;
-}
-function getDeviceId(){ return localStorage.getItem(LS_KEYS.DEVICE_ID) }
 
 function normalize(p){
   return {
@@ -109,7 +86,7 @@ function normalize(p){
     schedule: p.schedule || '',
     info: p.info || '',
     verified: !!p.verified,
-    createdBy: p.createdBy || p.deviceId || null, // compat
+    createdBy: p.createdBy || null,
     createdAt: p.createdAt || Date.now()
   };
 }
@@ -138,39 +115,48 @@ function applyFilters(list){
     (!q || (l.name + ' ' + l.sport).toLowerCase().includes(q))
   );
 
-  // Filtro "cerca de mí" si hay círculo activo
   if (nearCircle) {
     const center = nearCircle.getLatLng();
-    const radius = nearCircle.getRadius(); // metros
+    const radius = nearCircle.getRadius();
     filtered = filtered.filter(p => map.distance(center, [p.lat, p.lng]) <= radius);
   }
   return filtered;
 }
 
 function render(){
-  // limpiar marcadores existentes
   allMarkers.forEach(m => m.remove());
   allMarkers = [];
 
   const filtered = applyFilters(currentData);
-  const favs = new Set(readLS(LS_KEYS.FAVORITES, []));
-  const myId = getDeviceId();
+  const favs = getFavorites();
+  const myUserId = DS.getSessionUserId();
 
   filtered.forEach(p => {
     const marker = L.marker([p.lat, p.lng], { title: p.name }).addTo(map);
-
     const isFav = favs.has(p.id);
     const favLabel = isFav ? '★ Quitar de favoritos' : '☆ Agregar a favoritos';
-    const creator = p.createdBy ? `<small style="opacity:.85">Creado por: ${escapeHtml(String(p.createdBy).slice(0,16))}</small><br>` : '';
 
+    let creatorBlock = '';
+    if (p.createdBy) {
+      const u = DS.getUserById(p.createdBy);
+      const label = u ? (u.name || u.username || 'Usuario') : String(p.createdBy).slice(0,8);
+      creatorBlock = `
+        <small style="opacity:.85">Creado por: <strong>@${escapeHtml(label)}</strong></small><br>
+        <div class="popup-actions" style="margin-top:6px;">
+          <button onclick="viewCreatorProfile('${p.createdBy}')" class="button button--ghost" style="padding:.45rem .7rem">👤 Ver perfil</button>
+        </div>
+      `;
+    }
+
+    const canDelete = (p.createdBy && p.createdBy === myUserId);
     let actions = `
-      <div class="popup-actions">
+      <div class="popup-actions" style="margin-top:10px;">
         <div class="left">
           <button onclick="showInfo('${p.id}')" class="button button--ghost" style="padding:.45rem .7rem">ℹ️ Info</button>
           <button onclick="toggleFavorite('${p.id}')" class="button button--ghost" style="padding:.45rem .7rem">${favLabel}</button>
         </div>
         <div class="right">
-          ${ (p.createdBy && p.createdBy === myId) ? `<button onclick="deleteLocation('${p.id}')" class="button button--ghost" style="padding:.45rem .7rem">🗑️ Eliminar</button>` : '' }
+          ${ canDelete ? `<button onclick="deleteLocation('${p.id}')" class="button button--ghost" style="padding:.45rem .7rem">🗑️ Eliminar</button>` : '' }
         </div>
       </div>
     `;
@@ -178,7 +164,7 @@ function render(){
     marker.bindPopup(`
       <div class="popup">
         <h4 class="popup-title">${escapeHtml(p.name)}</h4>
-        ${creator}
+        ${creatorBlock}
         <div class="popup-meta">
           <small>Deporte: ${escapeHtml(p.sport)}</small>
           ${p.schedule ? `<small>Horario: ${escapeHtml(p.schedule)}</small>` : ''}
@@ -238,28 +224,21 @@ function ensureTempMarkerAt(lat, lng, open=false){
 }
 
 function saveLocation(){
+  if (!DS.isLoggedIn()) { alert('Debes iniciar sesión.'); return; }
+
   const name = byId('name').value.trim();
   const sport = byId('sport').value;
   const schedule = byId('hours').value.trim();
   const info = byId('more').value.trim();
 
-  if(!addMode){
-    alert('Pulsa “Añadir” para entrar en modo de colocación.');
-    return;
-  }
-  if(!tempLatLng){
-    alert('Haz clic en el mapa para colocar el marcador.');
-    return;
-  }
-  if(!name){
-    alert('Ingresa un nombre para el lugar.');
-    return;
-  }
+  if(!addMode){ alert('Pulsa “Añadir” para entrar en modo de colocación.'); return; }
+  if(!tempLatLng){ alert('Haz clic en el mapa para colocar el marcador.'); return; }
+  if(!name){ alert('Ingresa un nombre para el lugar.'); return; }
 
   const item = normalize({
     name, sport, schedule, info,
     lat: tempLatLng.lat, lng: tempLatLng.lng,
-    verified:false, createdBy:getDeviceId()
+    verified:false, createdBy: DS.getSessionUserId()
   });
 
   const list = readLS(LS_KEYS.LOCATIONS, []);
@@ -267,26 +246,24 @@ function saveLocation(){
   saveLS(LS_KEYS.LOCATIONS, list);
   currentData = list;
 
-  // limpiar formulario y modo
   byId('name').value = '';
   byId('hours').value = '';
   byId('more').value = '';
   if (tempMarker){ tempMarker.remove(); tempMarker = null; }
   tempLatLng = null;
   setAddMode(false);
-
-  render(); // <- esto agrega el nuevo marcador al mapa
+  render();
   alert(`Ubicación "${item.name}" guardada.`);
 }
 
-// ============= Eliminar y Favoritos =============
+// ============= Eliminar =============
 function deleteLocation(id){
   const list = readLS(LS_KEYS.LOCATIONS, []);
   const i = list.findIndex(x => x.id === id);
   if(i < 0) return;
 
-  const myId = getDeviceId();
-  if(list[i].createdBy !== myId){
+  const myUserId = DS.getSessionUserId();
+  if(list[i].createdBy !== myUserId){
     alert('Solo puedes eliminar ubicaciones que hayas añadido.');
     return;
   }
@@ -296,29 +273,31 @@ function deleteLocation(id){
   saveLS(LS_KEYS.LOCATIONS, list);
   currentData = list;
   render();
-  // refrescar panel favoritos si está abierto
   if (!byId('favPanel').hidden) fillFavPanel();
 }
 
-function getFavorites(){ return new Set(readLS(LS_KEYS.FAVORITES, [])); }
+// ============= Favoritos por usuario =============
+function getFavKey() {
+  const userId = DS.getSessionUserId();
+  return userId ? `${LS_KEYS.FAVORITES}_${userId}` : LS_KEYS.FAVORITES;
+}
+function getFavorites() { return new Set(readLS(getFavKey(), [])); }
+function saveFavorites(set) { saveLS(getFavKey(), Array.from(set)); }
 function toggleFavorite(id){
   const favs = getFavorites();
   if(favs.has(id)) favs.delete(id); else favs.add(id);
-  saveLS(LS_KEYS.FAVORITES, Array.from(favs));
+  saveFavorites(favs);
   render();
   if (!byId('favPanel').hidden) fillFavPanel();
 }
 
-// ============= Panel de Favoritos =============
-function openFavPanel(){
-  fillFavPanel();
-  byId('favPanel').hidden = false;
-}
+// Panel Favoritos
+function openFavPanel(){ fillFavPanel(); byId('favPanel').hidden = false; }
 function closeFavPanel(){ byId('favPanel').hidden = true; }
 
 function fillFavPanel(){
   const favList = byId('favList');
-  const favs = new Set(readLS(LS_KEYS.FAVORITES, []));
+  const favs = getFavorites();
   const items = currentData.filter(p => favs.has(p.id));
 
   if (!items.length){
@@ -338,11 +317,11 @@ function fillFavPanel(){
   `).join('');
 }
 
+// ============= Centro en favorito =============
 function centerOn(id){
   const p = currentData.find(x => x.id === id);
   if(!p) return;
   map.setView([p.lat, p.lng], Math.max(map.getZoom(), 15));
-  // abre popup del marcador correspondiente
   const mk = allMarkers.find(m => {
     const ll = m.getLatLng();
     return Math.abs(ll.lat - p.lat) < 1e-7 && Math.abs(ll.lng - p.lng) < 1e-7;
@@ -354,8 +333,17 @@ function centerOn(id){
 function showInfo(id){
   const item = currentData.find(x => x.id === id);
   if(!item) return;
+
+  let creatorLine = '';
+  if (item.createdBy) {
+    const u = DS.getUserById(item.createdBy);
+    const label = u ? (u.name || u.username || 'Usuario') : String(item.createdBy).slice(0,8);
+    creatorLine = `<p><strong>Creador:</strong> @${escapeHtml(label)}</p>`;
+  }
+
   byId('infoTitle').textContent = item.name;
   byId('infoBody').innerHTML = `
+    ${creatorLine}
     <p><strong>Deporte:</strong> ${escapeHtml(item.sport)}</p>
     ${item.schedule ? `<p><strong>Horario:</strong> ${escapeHtml(item.schedule)}</p>` : ''}
     ${item.info ? `<p><strong>Más información:</strong><br>${escapeHtml(item.info)}</p>` : '<p>No hay información adicional.</p>'}
@@ -365,22 +353,74 @@ function showInfo(id){
 }
 function hideInfo(){ byId('infoModal').hidden = true; }
 
-// ============= Cerca de mí (opcional) =============
+// ============= Cerca de mí =============
 function locateMe(){
   if (!navigator.geolocation){ alert('Geolocalización no soportada.'); return; }
   navigator.geolocation.getCurrentPosition(pos => {
     const { latitude, longitude } = pos.coords;
+    setNearCenter(latitude, longitude);
     map.setView([latitude, longitude], 15);
-    // solo centrado; el círculo se dibuja al aplicar
   }, () => alert('No fue posible obtener tu ubicación.'));
+}
+
+function setNearCenter(lat, lng){
+  if (nearCenterMarker) map.removeLayer(nearCenterMarker);
+  nearCenterMarker = L.marker([lat, lng], {
+    title: 'Centro de búsqueda',
+    icon: L.divIcon({
+      html: '📍',
+      className: 'near-marker',
+      iconSize: [24,24],
+      iconAnchor: [12,12]
+    })
+  }).addTo(map);
 }
 
 function applyNearFilter(){
   const km = Number(byId('nearRadius').value) || 3;
-  const center = map.getCenter();
+  let center = nearCenterMarker ? nearCenterMarker.getLatLng() : map.getCenter();
   const meters = km * 1000;
 
   if (nearCircle) map.removeLayer(nearCircle);
-  nearCircle = L.circle(center, { radius: meters, color:'#5aa3ff', fillColor:'#5aa3ff', fillOpacity:.15 }).addTo(map);
+  nearCircle = L.circle(center, {
+    radius: meters,
+    color:'#5aa3ff',
+    fillColor:'#5aa3ff',
+    fillOpacity:.15
+  }).addTo(map);
+
+  const label = L.tooltip(center, {
+    permanent: true,
+    direction: 'center',
+    className: 'near-label'
+  }).setContent(`Radio: ${km} km`);
+  nearCircle.bindTooltip(label);
+
   render();
+}
+
+function clearNear(){
+  if (nearCircle) { map.removeLayer(nearCircle); nearCircle = null; }
+  if (nearCenterMarker) { map.removeLayer(nearCenterMarker); nearCenterMarker = null; }
+  render();
+}
+
+function startSelectNearCenter(){
+  selectingCenter = true;
+  alert('Haz clic en el mapa para seleccionar el centro de búsqueda.');
+  map.once('click', (e) => {
+    setNearCenter(e.latlng.lat, e.latlng.lng);
+    map.setView(e.latlng, 15);
+    selectingCenter = false;
+  });
+}
+
+// --- Ver perfil creador ---
+function viewCreatorProfile(userId){
+  const myId = DS.getSessionUserId();
+  if (userId === myId){
+    location.href = 'profile.html';
+  } else {
+    alert('Por ahora solo puedes ver tu propio perfil.');
+  }
 }

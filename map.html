@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Deporte Conecta — Mapa</title>
 
+  <link rel="stylesheet" href="css/style.css"/>
+
   <!-- Leaflet -->
   <link
     rel="stylesheet"
@@ -12,174 +14,166 @@
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
     crossorigin=""
   />
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
 
-  <!-- Estilos globales del proyecto -->
-  <link rel="stylesheet" href="css/style.css"/>
-
-  <!-- Ajustes visuales para mapa: misma línea que la nueva home -->
-  <style>
-    :root{
-      /* Paleta usada en index */
-      --home-grad-a:#6fb3ff;
-      --home-grad-b:#8b7bff;
-      --home-accent:#ff8364;
-    }
-    /* Barra superior con nueva paleta */
-    .top-bar{
-      background: linear-gradient(90deg, rgba(111,179,255,.92), rgba(139,123,255,.92));
-    }
-    /* Botón de acción principal con acento coral */
-    .button--accent{
-      background: linear-gradient(135deg, var(--home-accent), #ff9d7e);
-      color:#201a1a;
-      border:none;
-      box-shadow: 0 10px 26px rgba(255,131,100,.35);
-    }
-    .button--accent:hover{ filter:brightness(1.05) }
-
-    /* Campos más compactos dentro de la top-bar (coherente con el último ajuste) */
-    .top-bar .select,
-    .top-bar .input{
-      background: rgba(0,0,0,.20);
-    }
-
-    /* Ajuste sutil de badges/estadísticas */
-    .stats{
-      font-weight:600; color:#f7fbff; opacity:.95;
-      padding-right:4px;
-    }
-
-    /* Iconitos en botones de la barra (espacio) */
-    .btn-ico{ display:inline-flex; align-items:center; gap:8px }
-  </style>
+  <!-- DataService: sesión y usuarios -->
+  <script src="js/dataService.js"></script>
+  <script>
+    // Guardia de acceso: si no hay sesión, ir a auth
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!DS.isLoggedIn()) {
+        location.href = 'auth.html';
+        return;
+      }
+      // Pintar saludo
+      const u = DS.getUserById(DS.getSessionUserId());
+      document.getElementById('topUser').textContent = u?.name || u?.username || 'Usuario';
+    });
+  </script>
 </head>
 <body class="map-body">
 
-  <!-- Barra superior -->
+  <!-- Barra superior compacta -->
   <header class="top-bar">
-    <a class="back" href="index.html" aria-label="Volver a inicio">← Inicio</a>
+    <a href="index.html" class="back">← Menú</a>
 
     <div class="filters">
       <label class="sr-only" for="sportFilter">Deporte</label>
-      <select id="sportFilter" class="select" aria-label="Filtrar por deporte">
-        <option value="">Todos</option>
-        <option value="Fútbol">Fútbol</option>
-        <option value="Baloncesto">Baloncesto</option>
-        <option value="Voleibol">Voleibol</option>
-        <option value="Ciclismo">Ciclismo</option>
-        <option value="Natación">Natación</option>
-        <option value="Tenis">Tenis</option>
-        <option value="Gimnasio">Gimnasio</option>
+      <select id="sportFilter" class="select" title="Filtrar por deporte">
+        <option value="">Todos los deportes</option>
+        <option>Fútbol</option>
+        <option>Baloncesto</option>
+        <option>Voleibol</option>
+        <option>Ciclismo</option>
+        <option>Running</option>
+        <option>Natación</option>
+        <option>Tenis</option>
+        <option>Gym</option>
       </select>
 
       <label class="sr-only" for="searchText">Buscar</label>
-      <input id="searchText" class="input" placeholder="Buscar por nombre o deporte..." />
+      <input id="searchText" class="input" placeholder="Buscar nombre o deporte…"/>
 
-      <button id="btnClear" class="button button--ghost">Limpiar</button>
-      <button id="btnAddMode" class="button button--accent btn-ico">➕ <span>Añadir</span></button>
-      <button id="btnFav" class="button button--ghost btn-ico">❤ <span>Favoritos</span></button>
-      <button id="btnNear" class="button button--ghost btn-ico">📍 <span>Cerca de mí</span></button>
+      <button id="btnClear" class="button button--ghost" title="Limpiar filtros">Limpiar</button>
+      <button id="btnAddMode" class="button" title="Añadir ubicación">➕ Añadir</button>
+      <button id="btnFav" class="button button--ghost" title="Ver favoritos">★ Favoritos</button>
+      <button id="btnNear" class="button button--ghost" title="Cerca de mí">📍 Cerca</button>
     </div>
 
-    <div class="stats" id="statsBar">Lugares: 0 · Top: — · Favoritos: 0</div>
+    <div class="filters">
+      <span>Hola, <strong id="topUser">Usuario</strong></span>
+      <button id="btnLogout" class="button button--ghost" title="Cerrar sesión">Salir</button>
+    </div>
   </header>
 
-  <!-- Contenedor del mapa -->
-  <div id="map" class="map" role="region" aria-label="Mapa de ubicaciones deportivas"></div>
+  <!-- Mapa -->
+  <div id="map" class="map" role="application" aria-label="Mapa colaborativo"></div>
 
-  <!-- Panel: Añadir ubicación -->
-  <aside id="addPanel" class="floating-panel card" hidden>
-    <h2>Agregar ubicación</h2>
-    <p>Activa “Añadir” y haz clic en el mapa para colocar el marcador. Puedes arrastrarlo antes de guardar.</p>
+  <!-- Barra de estadísticas -->
+  <div id="statsBar" class="header-small" style="padding:8px 16px; opacity:.95;"></div>
 
+  <!-- Panel flotante: Añadir ubicación -->
+  <aside id="addPanel" class="card floating-panel" hidden style="padding:12px; max-width:520px">
+    <h2>Nuevo lugar</h2>
+    <p>Activa “Añadir” y haz clic en el mapa. Ajusta el pin si es necesario.</p>
     <div class="grid2">
       <label>
-        <span>Nombre</span>
-        <input id="name" class="input" placeholder="Nombre del lugar"/>
+        <span>Nombre del lugar</span>
+        <input id="name" class="input" placeholder="Cancha, parque, pista…"/>
       </label>
-
       <label>
         <span>Deporte</span>
         <select id="sport" class="select">
-          <option value="Fútbol">Fútbol</option>
-          <option value="Baloncesto">Baloncesto</option>
-          <option value="Voleibol">Voleibol</option>
-          <option value="Ciclismo">Ciclismo</option>
-          <option value="Natación">Natación</option>
-          <option value="Tenis">Tenis</option>
-          <option value="Gimnasio">Gimnasio</option>
+          <option>Fútbol</option>
+          <option>Baloncesto</option>
+          <option>Voleibol</option>
+          <option>Ciclismo</option>
+          <option>Running</option>
+          <option>Natación</option>
+          <option>Tenis</option>
+          <option>Gym</option>
         </select>
       </label>
-
-      <label>
-        <span>Horario</span>
-        <input id="hours" class="input" placeholder="Ej. 08:00 - 18:00"/>
-      </label>
-
-      <label style="grid-column:1/-1">
-        <span>Más información</span>
-        <textarea id="more" class="input" rows="3" placeholder="Servicios, estado de la cancha, costo, notas…"></textarea>
-      </label>
     </div>
-
+    <label style="display:block; margin-top:8px">
+      <span>Horario (opcional)</span>
+      <input id="hours" class="input" placeholder="Ej. 6:00–10:00 y 16:00–20:00"/>
+    </label>
+    <label style="display:block; margin-top:8px">
+      <span>Más información (opcional)</span>
+      <input id="more" class="input" placeholder="Canchas techadas, iluminación, costo, acceso…"/>
+    </label>
     <div class="form-buttons">
       <button id="btnCancelAdd" class="button button--ghost">Cancelar</button>
-      <button id="btnSave" class="button button--accent">Guardar</button>
+      <button id="btnSave" class="button">Guardar</button>
     </div>
   </aside>
 
   <!-- Panel lateral: Favoritos -->
   <aside id="favPanel" class="side-panel" hidden>
     <div class="side-head">
-      <strong>Favoritos</strong>
+      <strong>Mis favoritos</strong>
       <button id="btnCloseFav" class="button button--ghost">Cerrar</button>
     </div>
-    <div id="favList" class="side-list">
-      <!-- items dinámicos -->
-    </div>
+    <div id="favList" class="side-list"></div>
   </aside>
 
-  <!-- Panel "Cerca de mí" -->
-  <aside id="nearPanel" class="near-panel" hidden>
-    <div class="near-row">
-      <strong>Buscar cerca de mí</strong>
-      <button id="btnCloseNear" class="button button--ghost">Cerrar</button>
-    </div>
-    <div class="near-row">
-      <label style="flex:1">
-        <span>Radio (km)</span>
-        <input id="nearRadius" class="input" type="number" min="0.5" step="0.5" value="3"/>
-      </label>
-      <button id="btnNearLocate" class="button button--accent">Usar mi ubicación</button>
-    </div>
-    <div class="near-row" style="justify-content:flex-start">
-      <button id="btnNearApply" class="button button--ghost">Aplicar filtro</button>
-      <button id="btnNearClear" class="button button--ghost">Quitar filtro</button>
-    </div>
-  </aside>
+  <!-- Panel “Cerca de mí” -->
+<!-- ===== Panel "Cerca de mí" ===== -->
+<div class="near-panel" id="nearPanel" hidden>
+  <div class="near-head">
+    <h3>Cerca de mí</h3>
+    <button class="button button--ghost" id="btnCloseNear">Cerrar</button>
+  </div>
 
-  <!-- Modal de información -->
+  <div class="near-section">
+    <label>Ubicación</label>
+    <div class="near-buttons">
+      <button class="button" id="btnNearLocate">📍 Usar mi ubicación</button>
+      <button class="button button--ghost" id="btnNearSelect">🖱️ Seleccionar en el mapa</button>
+    </div>
+  </div>
+
+  <div class="near-section">
+    <label for="nearRadius">Radio (km)</label>
+    <input type="number" id="nearRadius" class="input" value="3" min="0.1" step="0.1">
+  </div>
+
+  <div class="near-section near-actions">
+    <button class="button" id="btnNearApply">Aplicar</button>
+    <button class="button button--ghost" id="btnNearClear">Limpiar</button>
+  </div>
+
+  <p class="near-hint">
+    Consejo: usa “Seleccionar en el mapa” para definir el centro manualmente o “Usar mi ubicación” para centrar en tu posición.
+  </p>
+</div>
+
+
+  <!-- Modal Información -->
   <section id="infoModal" class="modal" hidden>
-    <div class="modal-backdrop" data-close="true"></div>
-    <div class="modal-card">
+    <div class="modal-backdrop" data-close></div>
+    <article class="modal-card">
       <div class="modal-head">
-        <h3 id="infoTitle" style="margin:0">Información</h3>
+        <h3 id="infoTitle" style="margin:0">Información del lugar</h3>
         <button id="infoClose" class="button button--ghost">Cerrar</button>
       </div>
-      <div id="infoBody" class="modal-body">
-        <!-- contenido dinámico -->
-      </div>
-    </div>
+      <div id="infoBody" class="modal-body"></div>
+    </article>
   </section>
 
-  <!-- Leaflet -->
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin="">
-  </script>
-
-  <!-- Lógica de la app -->
+  <!-- App JS -->
   <script src="js/map.js"></script>
+  <script>
+    // Cerrar sesión
+    document.getElementById('btnLogout')?.addEventListener('click', () => {
+      DS.clearSession();
+      location.href = 'auth.html';
+    });
+  </script>
 </body>
 </html>

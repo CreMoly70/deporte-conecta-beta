@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Deporte Conecta — Acceso</title>
+
+  <link rel="stylesheet" href="css/style.css"/>
+
+  <style>
+    .auth-wrap{ max-width: 880px; margin: 40px auto; padding: 16px; }
+    .auth-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+    @media (max-width: 900px){ .auth-grid{ grid-template-columns: 1fr; } }
+    .auth-card{
+      background: var(--panel-bg); border:1px solid var(--panel-border);
+      border-radius: 16px; padding: 16px; box-shadow: var(--panel-shadow);
+      backdrop-filter: blur(var(--panel-blur));
+    }
+    .auth-card h2{ margin: 0 0 10px; }
+    .auth-card p{ margin: 6px 0 12px; color:#cfe5f0 }
+    .row{ display:grid; gap:10px; margin-bottom:10px }
+    .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px }
+    .muted{ color:#cfe5f0; opacity:.9; font-size:.95rem }
+    .small{ font-size:.9rem; opacity:.9 }
+    .auth-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <main class="auth-wrap">
+    <div class="auth-head">
+      <a href="index.html" class="button button--ghost">← Volver</a>
+    </div>
+
+    <div class="auth-grid">
+      <!-- LOGIN -->
+      <section class="auth-card">
+        <h2>Iniciar sesión</h2>
+        <p class="muted">Accede con tu usuario o email.</p>
+
+        <div class="row">
+          <label>
+            <span>Usuario o Email</span>
+            <input id="loginId" class="input" placeholder="tuusuario o correo@ejemplo.com" autocomplete="username"/>
+          </label>
+          <label>
+            <span>Contraseña</span>
+            <input id="loginPass" class="input" type="password" placeholder="••••••••" autocomplete="current-password"/>
+          </label>
+        </div>
+
+        <div class="form-buttons">
+          <button id="btnLogin" class="button button--accent">Entrar</button>
+        </div>
+        <p class="small" style="margin-top:8px">¿No tienes cuenta? Regístrate al lado derecho.</p>
+      </section>
+
+      <!-- REGISTRO -->
+      <section class="auth-card">
+        <h2>Crear cuenta</h2>
+        <p class="muted">Tu perfil te permitirá crear y gestionar tus ubicaciones.</p>
+
+        <div class="row2">
+          <label>
+            <span>Usuario</span>
+            <input id="regUsername" class="input" placeholder="ej. jorge_toro" autocomplete="username"/>
+          </label>
+          <label>
+            <span>Email</span>
+            <input id="regEmail" class="input" type="email" placeholder="correo@ejemplo.com" autocomplete="email"/>
+          </label>
+        </div>
+
+        <div class="row2">
+          <label>
+            <span>Contraseña</span>
+            <input id="regPass" class="input" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" minlength="6"/>
+          </label>
+          <label>
+            <span>Confirmar contraseña</span>
+            <input id="regPass2" class="input" type="password" placeholder="Repite tu contraseña" autocomplete="new-password" minlength="6"/>
+          </label>
+        </div>
+
+        <div class="row">
+          <label>
+            <span>Nombre para mostrar (opcional)</span>
+            <input id="regName" class="input" placeholder="Tu nombre"/>
+          </label>
+        </div>
+
+        <div class="form-buttons">
+          <button id="btnRegister" class="button button--accent">Crear cuenta</button>
+        </div>
+
+        <p class="small" style="margin-top:8px">
+          Fase demo local (sin servidor). Luego podrás migrar los datos a backend real.
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <script src="js/dataService.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>
