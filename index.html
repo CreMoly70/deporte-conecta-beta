@@ -8,10 +8,14 @@
   <!-- Estilos globales -->
   <link rel="stylesheet" href="css/style.css"/>
 
-  <!-- DataService para validar sesión -->
+  <!-- Fuente Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- DataService: validar sesión -->
   <script src="js/dataService.js"></script>
   <script>
-    // Redirección a login si no hay sesión + saludo
     document.addEventListener('DOMContentLoaded', () => {
       if (!DS.isLoggedIn()) {
         location.href = 'auth.html';
@@ -20,237 +24,297 @@
       const userId = DS.getSessionUserId();
       const user = DS.getUserById(userId);
       const name = (user?.name || user?.username || 'Usuario');
-      const el = document.getElementById('welcomeName');
-      if (el) el.textContent = name;
+      document.getElementById('welcomeName').textContent = name;
     });
   </script>
 
-  <!-- Estilos específicos solo para la home -->
+  <!-- Estilos específicos HOME -->
   <style>
-    /* Paleta más equilibrada para la home */
     :root{
-      --home-grad-a: #6fb3ff;   /* azul suave */
-      --home-grad-b: #8b7bff;   /* lila frío */
-      --home-accent: #ff8364;   /* coral deportivo */
+      /* Fondo principal */
+      --home-grad-a: #1e3a5f;
+      --home-grad-b: #2b2e52;
       --home-bg: linear-gradient(135deg, var(--home-grad-a), var(--home-grad-b));
-      --home-card: rgba(255,255,255,0.10);
-      --home-border: rgba(255,255,255,0.18);
-      --home-shadow: 0 10px 30px rgba(20,30,60,.25);
+
+      /* Colores tarjeta MAPA */
+      --card-map-a: rgba(84,180,255,0.18);
+      --card-map-b: rgba(47,125,255,0.12);
+
+      /* Colores tarjeta CATÁLOGO */
+      --card-cat-a: rgba(255,150,90,0.20);
+      --card-cat-b: rgba(255,108,82,0.15);
+
+      --home-border: rgba(255,255,255,0.15);
+      --home-shadow: 0 10px 30px rgba(0,0,0,.25);
+      --accent: #37d8ff;
+      --accent2: #78ffd6;
     }
 
     body.home {
       background: var(--home-bg);
-      color:#f7fbff;
+      color:#f2f7ff;
+      font-family: 'Poppins', sans-serif;
     }
 
-    /* Barra superior mínima (saludo + logout) */
+    /* Barra superior */
     .top-mini{
-      display:flex; align-items:center; justify-content:space-between;
-      gap:10px; padding:10px 14px;
-      background: linear-gradient(90deg, rgba(111,179,255,.92), rgba(139,123,255,.92));
-      border-bottom:1px solid rgba(255,255,255,.18);
-      backdrop-filter: blur(8px);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 16px;
+      background: rgba(20,25,40,0.65);
+      border-bottom:1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(6px);
     }
-    .top-mini .greet{ font-weight:700; letter-spacing:.2px }
-    .btn-logout{ padding:.45rem .75rem; border-radius:10px; }
+    .top-mini .greet{
+      font-weight:700;
+      font-size:1.05rem;
+    }
+    .btn-logout{
+      padding:.45rem .85rem;
+      border-radius:10px;
+    }
 
-    /* Contenedor general */
+    /* CONTENEDOR DE ACCIONES (Perfil + Logout) */
+    .top-actions{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    /* Botón perfil */
+    .btn-profile{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:.55rem 1rem;
+      border-radius:10px;
+      background: rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.22);
+      text-decoration:none;
+      font-weight:600;
+      color:#fff;
+      transition: .15s ease;
+    }
+
+    .btn-profile:hover{
+      background: rgba(255,255,255,.22);
+      border-color: rgba(255,255,255,.32);
+      transform:translateY(-1px);
+    }
+
+    /* ICONO DEL PERFIL */
+    .btn-profile span.icon{
+      font-size:1.1rem;
+    }
+
+    /* Contenedor */
     .home-wrap{
       max-width: 1080px;
       margin: 0 auto;
-      padding: 40px 18px 56px;
+      padding: 40px 20px 60px;
     }
 
     /* Hero */
     .hero{
       text-align:center;
-      margin-bottom: 26px;
+      margin-bottom: 32px;
     }
     .hero h1{
-      margin:0 0 8px 0;
-      font-size: clamp(28px, 4vw, 44px);
-      letter-spacing:.2px;
+      margin:0 0 10px;
+      font-size: clamp(32px, 4vw, 46px);
+      font-weight:800;
     }
     .hero p{
+      max-width: 700px;
       margin:0 auto;
-      max-width: 720px;
-      opacity:.95;
-      font-size: clamp(14px, 2.2vw, 18px);
+      font-size: 1.05rem;
+      opacity:.92;
     }
 
-    /* Tarjetas */
+    /* Grid */
     .home-grid{
-      margin-top: 28px;
+      margin-top: 22px;
       display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 22px;
     }
-    @media (max-width: 980px){
-      .home-grid{ grid-template-columns: 1fr; max-width: 680px; margin-inline:auto; }
+    @media (max-width: 900px){
+      .home-grid{
+        grid-template-columns: 1fr;
+        max-width: 680px;
+        margin-inline:auto;
+      }
     }
 
+    /* Tarjetas base */
     .card-home{
-      background: var(--home-card);
       border:1px solid var(--home-border);
       border-radius: 18px;
-      padding: 18px;
+      padding: 20px;
       box-shadow: var(--home-shadow);
-      backdrop-filter: blur(8px);
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(10px);
       transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
-      position: relative;
-      overflow: hidden;
+      overflow:hidden;
     }
     .card-home:hover{
       transform: translateY(-3px);
-      box-shadow: 0 16px 40px rgba(20,30,60,.35);
-      border-color: rgba(255,255,255,.28);
+      border-color: rgba(255,255,255,0.25);
+      box-shadow: 0 18px 45px rgba(0,0,0,.35);
     }
 
-    /* Encabezado de tarjeta */
+    /* Mapa */
+    .card-map{
+      background: linear-gradient(145deg, var(--card-map-a), var(--card-map-b));
+      border-color: rgba(120,200,255,0.5);
+    }
+    .card-map .card-icon{
+      background: radial-gradient(circle, #37d8ff, #2f7aff);
+      border-color: rgba(170,230,255,0.9);
+      color:#102030;
+    }
+
+    /* Catálogo */
+    .card-cat{
+      background: linear-gradient(145deg, var(--card-cat-a), var(--card-cat-b));
+      border-color: rgba(255,180,130,0.7);
+    }
+    .card-cat .card-icon{
+      background: radial-gradient(circle, #ffcf9d, #ff8a66);
+      border-color: rgba(255,210,170,0.85);
+      color:#2e1a1a;
+    }
+
+    /* Elementos internos */
     .card-head{
-      display:flex; align-items:center; gap:12px;
-      margin-bottom: 10px;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      margin-bottom: 12px;
     }
     .card-icon{
-      width: 40px; height: 40px; flex: 0 0 40px;
+      width: 44px;
+      height: 44px;
+      display:grid;
+      place-items:center;
       border-radius: 12px;
-      display:grid; place-items:center;
-      background: rgba(255,255,255,.14);
-      border:1px solid rgba(255,255,255,.25);
-      box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
-      font-size: 22px;
+      font-size:24px;
     }
     .card-title{
-      font-weight: 800; font-size: 1.15rem; letter-spacing:.2px; margin:0;
+      margin:0;
+      font-size:1.25rem;
+      font-weight:800;
     }
     .card-body{
-      color:#e7f2ff; opacity:.95; font-size: .98rem; line-height:1.45;
-      min-height: 72px;
+      margin:0 0 14px;
+      opacity:.95;
+      line-height:1.55;
+      font-size:1rem;
     }
 
-    /* Botones de acción con estilo más estético */
+    /* Botones */
     .btn{
-      display:inline-flex; align-items:center; gap:10px;
-      padding:.70rem 1rem;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.22);
-      background: rgba(255,255,255,.10);
-      color:#fff; text-decoration:none; font-weight:700;
-      transition: transform .12s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
-      box-shadow: 0 6px 18px rgba(0,0,0,.18);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:.75rem 1rem;
+      border-radius:12px;
+      background: rgba(255,255,255,.14);
+      color:#fff;
+      border:1px solid rgba(255,255,255,.22);
+      font-weight:700;
+      text-decoration:none;
+      transition: .15s ease;
     }
-    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.32) }
-
+    .btn:hover{
+      background: rgba(255,255,255,.22);
+      border-color: rgba(255,255,255,.32);
+    }
     .btn-primary{
-      background: linear-gradient(135deg, var(--home-accent), #ff9d7e);
-      color:#201a1a;
-      border: none;
-      box-shadow: 0 10px 26px rgba(255,131,100,.35);
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color:#0f1a24;
+      border:none;
     }
     .btn-primary:hover{
-      filter: brightness(1.05);
-      transform: translateY(-1px);
+      filter:brightness(1.05);
+      transform:translateY(-1px);
     }
 
-    .btn-ghost{ background: rgba(255,255,255,.10) }
-
-    /* Badges y estados */
-    .badge{
-      display:inline-block;
-      padding:.35rem .6rem;
-      border-radius: 999px;
-      background: rgba(255,255,255,.14);
-      border:1px solid rgba(255,255,255,.24);
-      font-size:.85rem; font-weight:700;
-    }
-
-    /* Pie simple */
+    /* Footer */
     .home-foot{
-      margin-top: 28px;
-      text-align: left;
-      opacity:.9;
+      margin-top: 32px;
+      opacity:.85;
       font-size:.95rem;
-    }
-
-    /* Microdecoraciones sutiles en las tarjetas */
-    .card-home::after{
-      content:"";
-      position:absolute; inset:auto -40% -60% auto;
-      width:200px; height:200px; border-radius:50%;
-      background: radial-gradient(closest-side, rgba(255,255,255,.16), transparent 70%);
-      transform: rotate(15deg);
-      pointer-events:none;
+      text-align:left;
     }
   </style>
 </head>
+
 <body class="home">
 
-  <!-- Barra mini con saludo + logout -->
+  <!-- Barra superior -->
   <div class="top-mini">
     <div class="greet">Bienvenido, <span id="welcomeName">Usuario</span></div>
-    <button id="btnLogout" class="button button--ghost btn-logout">Cerrar sesión</button>
+
+    <div class="top-actions">
+      <a href="profile.html" class="btn-profile">
+        <span class="icon">👤</span>
+        Perfil
+      </a>
+
+      <button id="btnLogout" class="button button--ghost btn-logout">Cerrar sesión</button>
+    </div>
   </div>
 
+  <!-- Contenido principal -->
   <main class="home-wrap">
-    <!-- Hero -->
+
     <header class="hero">
       <h1>Deporte Conecta</h1>
-      <p>
-        Conecta con tu pasión. Descubre lugares, crea encuentros y comparte deporte.
-      </p>
+      <p>Conecta con tu pasión. Descubre lugares, crea encuentros y comparte deporte.</p>
     </header>
 
-    <!-- Tarjetas principales -->
-    <section class="home-grid" aria-label="Secciones principales">
+    <section class="home-grid">
+
       <!-- Mapa -->
-      <article class="card-home">
+      <article class="card-home card-map">
         <div class="card-head">
-          <div class="card-icon" aria-hidden="true">🗺️</div>
+          <div class="card-icon">🗺️</div>
           <h2 class="card-title">Mapa colaborativo</h2>
         </div>
         <p class="card-body">
-          Explora y agrega ubicaciones deportivas por disciplina y horario. Filtra, guarda favoritos y descubre lugares cerca de ti.
+          Explora y agrega ubicaciones deportivas según disciplina. Filtra, favoritos y encuentra lugares cerca de ti.
         </p>
-        <a class="btn btn-primary" href="map.html" aria-label="Abrir mapa colaborativo">Abrir mapa</a>
+        <a class="btn btn-primary" href="map.html">Abrir mapa</a>
       </article>
 
       <!-- Catálogo -->
-      <article class="card-home">
+      <article class="card-home card-cat">
         <div class="card-head">
-          <div class="card-icon" aria-hidden="true">📚</div>
+          <div class="card-icon">📚</div>
           <h2 class="card-title">Catálogo de deportes</h2>
         </div>
         <p class="card-body">
-          Conoce cada disciplina: reglas básicas, consejos, beneficios y lugares disponibles en tu zona.
+          Aprende sobre cada deporte: reglas, consejos, beneficios y espacios disponibles para practicarlo.
         </p>
-        <a class="btn btn-ghost" href="catalog.html" aria-label="Ver catálogo de deportes">Ver catálogo</a>
+        <a class="btn" href="catalog.html">Ver catálogo</a>
       </article>
 
-      <!-- Comunidad (próx.) -->
-      <article class="card-home">
-        <div class="card-head">
-          <div class="card-icon" aria-hidden="true">🤝</div>
-          <h2 class="card-title">Comunidad</h2>
-        </div>
-        <p class="card-body">
-          Conecta con personas que practican lo mismo que tú. Organiza encuentros y comparte tu progreso.
-        </p>
-        <span class="badge" title="Disponible próximamente">Próximamente</span>
-      </article>
     </section>
 
-    <!-- Pie -->
     <footer class="home-foot">
       Proyecto de Investigación – Sebastián García Cruz
     </footer>
+
   </main>
 
   <script>
-    // Cerrar sesión
     document.getElementById('btnLogout')?.addEventListener('click', () => {
       DS.clearSession();
       location.href = 'auth.html';
     });
   </script>
+
 </body>
 </html>

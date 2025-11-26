@@ -5,65 +5,222 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Deporte Conecta — Acceso</title>
 
+  <!-- Fuente -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Estilos globales -->
   <link rel="stylesheet" href="css/style.css"/>
 
   <style>
-    .auth-wrap{ max-width: 880px; margin: 40px auto; padding: 16px; }
-    .auth-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
-    @media (max-width: 900px){ .auth-grid{ grid-template-columns: 1fr; } }
-    .auth-card{
-      background: var(--panel-bg); border:1px solid var(--panel-border);
-      border-radius: 16px; padding: 16px; box-shadow: var(--panel-shadow);
-      backdrop-filter: blur(var(--panel-blur));
+
+    /* ================================
+       FONDO GENERAL MÁS OSCURO
+    =================================*/
+    body{
+      margin:0;
+      font-family:'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1b2a49, #3b338c);
+      color:#f7fbff;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
     }
-    .auth-card h2{ margin: 0 0 10px; }
-    .auth-card p{ margin: 6px 0 12px; color:#cfe5f0 }
-    .row{ display:grid; gap:10px; margin-bottom:10px }
-    .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px }
-    .muted{ color:#cfe5f0; opacity:.9; font-size:.95rem }
-    .small{ font-size:.9rem; opacity:.9 }
-    .auth-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; }
+
+    /* ================================
+       ENCABEZADO PROFESIONAL
+    =================================*/
+    .auth-header{
+      text-align:center;
+      margin-top:60px;
+      margin-bottom:30px;
+      padding:0 20px;
+    }
+
+    .auth-header h1{
+      font-size:2.6rem;
+      font-weight:800;
+      margin-bottom:10px;
+    }
+
+    .auth-header p{
+      font-size:1.1rem;
+      opacity:0.85;
+      max-width:600px;
+      margin:0 auto;
+      line-height:1.5;
+    }
+
+    /* ================================
+       CONTENEDOR DE TARJETAS
+    =================================*/
+    main.auth-wrap{
+      max-width:1100px;
+      margin:0 auto 70px auto;
+      padding:0 20px;
+      width:100%;
+    }
+
+    .auth-grid{
+      margin-top:20px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:35px;
+    }
+
+    @media(max-width:900px){
+      .auth-grid{ grid-template-columns:1fr; }
+    }
+
+    /* ================================
+       TARJETAS TIPO GLASS PREMIUM
+    =================================*/
+    .auth-card{
+      background:rgba(255,255,255,0.08);
+      backdrop-filter:blur(16px);
+      padding:35px;
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,0.18);
+      box-shadow:0 18px 40px rgba(0,0,0,0.25);
+    }
+
+    .auth-card h2{
+      margin:0 0 12px;
+      font-weight:700;
+      font-size:1.55rem;
+    }
+
+    .muted{
+      margin:0 0 22px;
+      opacity:.92;
+      font-size:1rem;
+    }
+
+    .row, .row2{
+      display:grid;
+      gap:15px;
+      margin-bottom:20px;
+    }
+
+    .row2{
+      grid-template-columns:1fr 1fr;
+    }
+
+    @media(max-width:600px){
+      .row2{ grid-template-columns:1fr; }
+    }
+
+    label span{
+      font-size:.85rem;
+      font-weight:600;
+      opacity:.90;
+    }
+
+    /* ================================
+       INPUTS LIMPIOS
+    =================================*/
+    .input{
+      width:100%;
+      padding:14px 15px;
+      margin-top:6px;
+      background:rgba(255,255,255,0.22);
+      border:none;
+      border-radius:12px;
+      color:white;
+      outline:none;
+      font-size:.95rem;
+      transition:0.18s;
+    }
+
+    .input:focus{
+      background:rgba(255,255,255,0.32);
+    }
+
+    .input::placeholder{
+      color:rgba(255,255,255,0.7);
+    }
+
+    /* ================================
+       BOTONES
+    =================================*/
+    .button--accent{
+      width:100%;
+      padding:14px;
+      background:#ff996e;
+      border:none;
+      color:white;
+      border-radius:12px;
+      font-weight:700;
+      font-size:1rem;
+      cursor:pointer;
+      transition:0.20s;
+      box-shadow:0 8px 18px rgba(255,153,110,0.45);
+    }
+
+    .button--accent:hover{
+      background:#ff8250;
+      box-shadow:0 10px 22px rgba(255,153,110,0.60);
+      transform:translateY(-2px);
+    }
+
+    .small{
+      font-size:.9rem;
+      opacity:.85;
+    }
+
   </style>
+
 </head>
+
 <body>
+
+  <!-- ENCABEZADO PROFESIONAL -->
+  <header class="auth-header">
+    <h1>Bienvenido a Deporte Conecta</h1>
+    <p>
+      Inicia sesión para explorar lugares deportivos, crear tus propios puntos y guardar tus favoritos.
+      Si aún no tienes cuenta, puedes registrarte fácilmente aquí mismo.
+    </p>
+  </header>
+
   <main class="auth-wrap">
-    <div class="auth-head">
-      <a href="index.html" class="button button--ghost">← Volver</a>
-    </div>
 
     <div class="auth-grid">
+
       <!-- LOGIN -->
       <section class="auth-card">
         <h2>Iniciar sesión</h2>
-        <p class="muted">Accede con tu usuario o email.</p>
+        <p class="muted">Accede con tu usuario o email para continuar.</p>
 
         <div class="row">
           <label>
             <span>Usuario o Email</span>
             <input id="loginId" class="input" placeholder="tuusuario o correo@ejemplo.com" autocomplete="username"/>
           </label>
+
           <label>
             <span>Contraseña</span>
             <input id="loginPass" class="input" type="password" placeholder="••••••••" autocomplete="current-password"/>
           </label>
         </div>
 
-        <div class="form-buttons">
-          <button id="btnLogin" class="button button--accent">Entrar</button>
-        </div>
-        <p class="small" style="margin-top:8px">¿No tienes cuenta? Regístrate al lado derecho.</p>
+        <button id="btnLogin" class="button--accent">Entrar</button>
+
+        <p class="small" style="margin-top:10px">¿No tienes cuenta? Regístrate al lado derecho.</p>
       </section>
 
       <!-- REGISTRO -->
       <section class="auth-card">
         <h2>Crear cuenta</h2>
-        <p class="muted">Tu perfil te permitirá crear y gestionar tus ubicaciones.</p>
+        <p class="muted">Tu cuenta te permitirá crear lugares y guardar favoritos.</p>
 
         <div class="row2">
           <label>
             <span>Usuario</span>
-            <input id="regUsername" class="input" placeholder="ej. jorge_toro" autocomplete="username"/>
+            <input id="regUsername" class="input" placeholder="ej. juan_toro" autocomplete="username"/>
           </label>
+
           <label>
             <span>Email</span>
             <input id="regEmail" class="input" type="email" placeholder="correo@ejemplo.com" autocomplete="email"/>
@@ -73,29 +230,29 @@
         <div class="row2">
           <label>
             <span>Contraseña</span>
-            <input id="regPass" class="input" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" minlength="6"/>
+            <input id="regPass" class="input" type="password" minlength="6" placeholder="mínimo 6 caracteres" autocomplete="new-password"/>
           </label>
+
           <label>
             <span>Confirmar contraseña</span>
-            <input id="regPass2" class="input" type="password" placeholder="Repite tu contraseña" autocomplete="new-password" minlength="6"/>
+            <input id="regPass2" class="input" type="password" minlength="6" placeholder="repite la contraseña" autocomplete="new-password"/>
           </label>
         </div>
 
         <div class="row">
           <label>
             <span>Nombre para mostrar (opcional)</span>
-            <input id="regName" class="input" placeholder="Tu nombre"/>
+            <input id="regName" class="input" placeholder="Tu nombre o apodo"/>
           </label>
         </div>
 
-        <div class="form-buttons">
-          <button id="btnRegister" class="button button--accent">Crear cuenta</button>
-        </div>
+        <button id="btnRegister" class="button--accent">Crear cuenta</button>
 
-        <p class="small" style="margin-top:8px">
-          Fase demo local (sin servidor). Luego podrás migrar los datos a backend real.
+        <p class="small" style="margin-top:10px">
+          Esta es una versión demo local (sin servidor). Luego podrás migrar los datos a un backend real.
         </p>
       </section>
+
     </div>
   </main>
 

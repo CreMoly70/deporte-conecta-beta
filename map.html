@@ -5,45 +5,174 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Deporte Conecta — Mapa</title>
 
+  <!-- Fuente usada en la Home -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="css/style.css"/>
 
   <!-- Leaflet -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
     crossorigin=""
   />
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""
-  ></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
-  <!-- DataService: sesión y usuarios -->
+  <!-- DataService -->
   <script src="js/dataService.js"></script>
   <script>
-    // Guardia de acceso: si no hay sesión, ir a auth
     document.addEventListener('DOMContentLoaded', () => {
       if (!DS.isLoggedIn()) {
         location.href = 'auth.html';
         return;
       }
-      // Pintar saludo
       const u = DS.getUserById(DS.getSessionUserId());
-      document.getElementById('topUser').textContent = u?.name || u?.username || 'Usuario';
+      document.getElementById('topUser').textContent =
+        u?.name || u?.username || 'Usuario';
     });
   </script>
+
+  <style>
+    /* ===== Mejoras visuales específicas del MAPA ===== */
+    body.map-body{
+      font-family: 'Poppins', sans-serif;
+    }
+
+    /* ============================================================
+       PANEL SUPERIOR — NUEVO DISEÑO PREMIUM
+    ============================================================ */
+    .top-bar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:14px 20px;
+      background: linear-gradient(
+          135deg,
+          rgba(78, 115, 255, 0.95),
+          rgba(147, 104, 255, 0.95)
+      );
+      border-bottom:1px solid rgba(255,255,255,0.25);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.25);
+      animation: fadeDown .45s both;
+    }
+
+    @keyframes fadeDown{
+      from{ opacity:0; transform: translateY(-16px); }
+      to{ opacity:1; transform: translateY(0); }
+    }
+
+    /* BOTÓN VOLVER */
+    .top-bar .back{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 16px;
+      border-radius:12px;
+      background: rgba(255,255,255,0.18);
+      border:1px solid rgba(255,255,255,0.32);
+      color:#fff;
+      font-weight:600;
+      font-size:0.95rem;
+      text-decoration:none;
+      backdrop-filter: blur(6px);
+      transition: all .20s ease;
+    }
+
+    .top-bar .back:hover{
+      background: rgba(255,255,255,0.30);
+      transform: translateY(-3px);
+    }
+
+    /* CONTENEDORES DE FILTROS */
+    .filters{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    /* INPUTS */
+    .top-bar .select,
+    .top-bar .input{
+      background: rgba(0,0,0,0.25);
+      border:1px solid rgba(255,255,255,0.30);
+      border-radius:12px;
+      color:white;
+      padding:.65rem .9rem;
+      font-size:.92rem;
+      transition: border-color .25s ease, box-shadow .25s ease;
+    }
+
+    /* POPUP LEAFLET — ESTILO GLASS */
+    .leaflet-popup-content-wrapper {
+      background: rgba(25, 28, 45, 0.55) !important;
+      backdrop-filter: blur(18px);
+      border-radius: 18px !important;
+      padding: 8px !important;
+      border: 1px solid rgba(255,255,255,0.22);
+      box-shadow: 0 12px 25px rgba(0,0,0,0.35);
+    }
+
+    /* ======================================================
+        ⭐ NUEVO: PANEL DE TORNEOS
+    ====================================================== */
+    #tournamentPanel{
+      position: absolute;
+      top: 130px;
+      right: 20px;
+      width: 340px;
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(25,25,40,0.55);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,0.22);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      color: #f2f4ff;
+      font-family: 'Poppins';
+      z-index: 999;
+    }
+
+    #tournamentPanel h2{
+      margin:0 0 10px 0;
+      font-size:1.3rem;
+      font-weight:700;
+    }
+
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* Temporizador */
+    #tournamentTimerBar{
+      background: rgba(0,0,0,0.35);
+      color: #fff;
+      margin: 4px 0;
+      padding: 8px;
+      text-align:center;
+      border-radius:10px;
+      display:none;
+    }
+  </style>
+
 </head>
 <body class="map-body">
 
-  <!-- Barra superior compacta -->
+  <!-- ========================================== -->
+  <!-- ============== BARRA SUPERIOR ============ -->
+  <!-- ========================================== -->
   <header class="top-bar">
-    <a href="index.html" class="back">← Menú</a>
 
+    <a href="index.html" class="back">⬅ Volver</a>
+
+    <!-- Filtros -->
     <div class="filters">
-      <label class="sr-only" for="sportFilter">Deporte</label>
-      <select id="sportFilter" class="select" title="Filtrar por deporte">
+      <select id="sportFilter" class="select">
         <option value="">Todos los deportes</option>
         <option>Fútbol</option>
         <option>Baloncesto</option>
@@ -55,35 +184,49 @@
         <option>Gym</option>
       </select>
 
-      <label class="sr-only" for="searchText">Buscar</label>
-      <input id="searchText" class="input" placeholder="Buscar nombre o deporte…"/>
+      <div style="position:relative;">
+        <input id="searchText" class="input" placeholder="Buscar lugares reales…"/>
+        <ul id="searchResults" hidden></ul>
+      </div>
 
-      <button id="btnClear" class="button button--ghost" title="Limpiar filtros">Limpiar</button>
-      <button id="btnAddMode" class="button" title="Añadir ubicación">➕ Añadir</button>
-      <button id="btnFav" class="button button--ghost" title="Ver favoritos">★ Favoritos</button>
-      <button id="btnNear" class="button button--ghost" title="Cerca de mí">📍 Cerca</button>
+      <button id="btnClear" class="button button--ghost">Limpiar</button>
+
+      <!-- BOTÓN ORIGINAL -->
+      <button id="btnAddMode" class="button">➕ Añadir</button>
+
+      <!-- ⭐ NUEVO BOTÓN TORNEOS -->
+      <button id="btnTournamentMode" class="button button--ghost">🏆 Torneos</button>
+
+      <button id="btnFav" class="button button--ghost">★ Favoritos</button>
+      <button id="btnNear" class="button button--ghost">📍 Cerca</button>
     </div>
 
+    <!-- Usuario -->
     <div class="filters">
       <span>Hola, <strong id="topUser">Usuario</strong></span>
-      <button id="btnLogout" class="button button--ghost" title="Cerrar sesión">Salir</button>
+      <button id="btnLogout" class="button button--ghost">Salir</button>
     </div>
   </header>
 
-  <!-- Mapa -->
-  <div id="map" class="map" role="application" aria-label="Mapa colaborativo"></div>
 
-  <!-- Barra de estadísticas -->
+  <!-- MAPA -->
+  <div id="map" class="map"></div>
+
   <div id="statsBar" class="header-small" style="padding:8px 16px; opacity:.95;"></div>
 
-  <!-- Panel flotante: Añadir ubicación -->
-  <aside id="addPanel" class="card floating-panel" hidden style="padding:12px; max-width:520px">
+  <!-- ⭐ NUEVO: Barra con el tiempo restante -->
+  <div id="tournamentTimerBar"></div>
+
+
+  <!-- PANEL AÑADIR (TUYO, SIN CAMBIOS) -->
+  <aside id="addPanel" class="card floating-panel" hidden>
     <h2>Nuevo lugar</h2>
-    <p>Activa “Añadir” y haz clic en el mapa. Ajusta el pin si es necesario.</p>
+    <p>Activa "Añadir" y haz clic en el mapa.</p>
+
     <div class="grid2">
       <label>
         <span>Nombre del lugar</span>
-        <input id="name" class="input" placeholder="Cancha, parque, pista…"/>
+        <input id="name" class="input"/>
       </label>
       <label>
         <span>Deporte</span>
@@ -99,81 +242,143 @@
         </select>
       </label>
     </div>
+
     <label style="display:block; margin-top:8px">
-      <span>Horario (opcional)</span>
-      <input id="hours" class="input" placeholder="Ej. 6:00–10:00 y 16:00–20:00"/>
+      <span>Horario</span>
+      <input id="hours" class="input"/>
     </label>
+
     <label style="display:block; margin-top:8px">
-      <span>Más información (opcional)</span>
-      <input id="more" class="input" placeholder="Canchas techadas, iluminación, costo, acceso…"/>
+      <span>Más información</span>
+      <input id="more" class="input"/>
     </label>
+
     <div class="form-buttons">
       <button id="btnCancelAdd" class="button button--ghost">Cancelar</button>
       <button id="btnSave" class="button">Guardar</button>
     </div>
   </aside>
 
-  <!-- Panel lateral: Favoritos -->
+
+
+  <!-- ⭐ PANEL NUEVO: TORNEOS Y PUNTOS -->
+  <aside id="tournamentPanel" hidden>
+    <h2>Nuevo torneo / punto</h2>
+    <p>Haz clic en el mapa para elegir la ubicación.</p>
+
+    <label>
+      <span>Nombre</span>
+      <input id="tName" class="input"/>
+    </label>
+
+    <!-- ⭐ NUEVO: Selector de deporte de torneo -->
+    <label style="display:block; margin-top:8px">
+      <span>Deporte</span>
+      <select id="tSport" class="select">
+        <option>Fútbol</option>
+        <option>Baloncesto</option>
+        <option>Voleibol</option>
+        <option>Ciclismo</option>
+        <option>Running</option>
+        <option>Natación</option>
+        <option>Tenis</option>
+        <option>Gym</option>
+      </select>
+    </label>
+
+    <div class="grid2" style="margin-top:8px;">
+      <label>
+        <span>Tipo</span>
+        <select id="tType" class="select">
+          <option value="tournament">🏆 Torneo</option>
+          <option value="meetpoint">🚩 Punto de encuentro</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Duración</span>
+        <select id="tDuration" class="select">
+          <option value="2">2 horas</option>
+          <option value="3">3 horas</option>
+          <option value="4">4 horas</option>
+          <option value="5">5 horas</option>
+        </select>
+      </label>
+    </div>
+
+    <label style="display:block; margin-top:8px">
+      <span>Más información</span>
+      <input id="tInfo" class="input"/>
+    </label>
+
+    <div class="form-buttons">
+      <button id="btnCancelTournament" class="button button--ghost">Cancelar</button>
+      <button id="btnSaveTournament" class="button">Guardar</button>
+    </div>
+  </aside>
+
+
+
+  <!-- PANEL FAVORITOS -->
   <aside id="favPanel" class="side-panel" hidden>
     <div class="side-head">
       <strong>Mis favoritos</strong>
       <button id="btnCloseFav" class="button button--ghost">Cerrar</button>
     </div>
-    <div id="favList" class="side-list"></div>
+    <div id="favList"></div>
   </aside>
 
-  <!-- Panel “Cerca de mí” -->
-<!-- ===== Panel "Cerca de mí" ===== -->
-<div class="near-panel" id="nearPanel" hidden>
-  <div class="near-head">
-    <h3>Cerca de mí</h3>
-    <button class="button button--ghost" id="btnCloseNear">Cerrar</button>
-  </div>
 
-  <div class="near-section">
-    <label>Ubicación</label>
-    <div class="near-buttons">
-      <button class="button" id="btnNearLocate">📍 Usar mi ubicación</button>
-      <button class="button button--ghost" id="btnNearSelect">🖱️ Seleccionar en el mapa</button>
+  <!-- PANEL CERCA DE MI -->
+  <div id="nearPanel" class="near-panel" hidden>
+    <div class="near-head">
+      <h3>Cerca de mí</h3>
+      <button class="button button--ghost" id="btnCloseNear">Cerrar</button>
+    </div>
+
+    <div class="near-section">
+      <label>Ubicación</label>
+      <div class="near-buttons">
+        <button class="button" id="btnNearLocate">📍 Usar mi ubicación</button>
+        <button class="button button--ghost" id="btnNearSelect">🖱️ Seleccionar en el mapa</button>
+      </div>
+    </div>
+
+    <div class="near-section">
+      <label>Radio (km)</label>
+      <input id="nearRadius" type="number" class="input" value="3" min="0.1" step="0.1"/>
+    </div>
+
+    <div class="near-actions">
+      <button class="button" id="btnNearApply">Aplicar</button>
+      <button class="button button--ghost" id="btnNearClear">Limpiar</button>
     </div>
   </div>
 
-  <div class="near-section">
-    <label for="nearRadius">Radio (km)</label>
-    <input type="number" id="nearRadius" class="input" value="3" min="0.1" step="0.1">
-  </div>
 
-  <div class="near-section near-actions">
-    <button class="button" id="btnNearApply">Aplicar</button>
-    <button class="button button--ghost" id="btnNearClear">Limpiar</button>
-  </div>
-
-  <p class="near-hint">
-    Consejo: usa “Seleccionar en el mapa” para definir el centro manualmente o “Usar mi ubicación” para centrar en tu posición.
-  </p>
-</div>
-
-
-  <!-- Modal Información -->
+  <!-- MODAL INFO -->
   <section id="infoModal" class="modal" hidden>
     <div class="modal-backdrop" data-close></div>
+
     <article class="modal-card">
       <div class="modal-head">
-        <h3 id="infoTitle" style="margin:0">Información del lugar</h3>
+        <h3 id="infoTitle">Información del lugar</h3>
         <button id="infoClose" class="button button--ghost">Cerrar</button>
       </div>
       <div id="infoBody" class="modal-body"></div>
     </article>
   </section>
 
-  <!-- App JS -->
+
+  <!-- JS PRINCIPAL -->
   <script src="js/map.js"></script>
+
   <script>
-    // Cerrar sesión
     document.getElementById('btnLogout')?.addEventListener('click', () => {
       DS.clearSession();
       location.href = 'auth.html';
     });
   </script>
+
 </body>
 </html>

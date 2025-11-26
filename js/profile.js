@@ -1,4 +1,8 @@
-/* Deporte Conecta · Pantalla de perfil (demo local) */
+/* Deporte Conecta · Pantalla de perfil (demo local)
+   • Misma funcionalidad
+   • Mejor feedback visual
+   • Alertas modernizadas (estilo toast simple)
+*/
 
 // Claves usadas por el mapa
 const LS_KEYS = {
@@ -6,26 +10,28 @@ const LS_KEYS = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (!DS.isLoggedIn()) return; // guardia adicional
+  if (!DS.isLoggedIn()) return;
 
-  // Cargar datos de usuario
   const user = DS.getUserById(DS.getSessionUserId());
-  if (!user) { DS.clearSession(); location.href = 'auth.html'; return; }
+  if (!user) { 
+    DS.clearSession(); 
+    location.href = 'auth.html'; 
+    return; 
+  }
 
-  // Saludo
+  // saludo
   byId('helloUser').textContent = `Hola, ${user.name || user.username}`;
 
-  // Avatar
+  // avatar
   renderAvatar(user.avatar);
 
-  // Inputs perfil
+  // valores iniciales
   byId('name').value = user.name || '';
   byId('username').value = user.username || '';
   byId('email').value = user.email || '';
   byId('city').value = user.city || '';
   byId('bio').value = user.bio || '';
 
-  // Deportes favoritos
   const mult = byId('sportsFav');
   setMultiSelect(mult, user.sportsFav || []);
   renderSportsPreview(user.sportsFav || []);
@@ -35,23 +41,23 @@ document.addEventListener('DOMContentLoaded', () => {
     renderSportsPreview(sel);
   });
 
-  // Cambiar avatar (dataURL)
+  // cambio de avatar
   byId('avatarInput').addEventListener('change', async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const dataURL = await fileToDataURL(file);
-    renderAvatar(dataURL);
-    // No guardamos aún hasta que pulse "Guardar cambios"
+    const data = await fileToDataURL(file);
+    renderAvatar(data);
   });
 
-  // Guardar perfil
   byId('btnSaveProfile').addEventListener('click', onSaveProfile);
 
-  // Mis ubicaciones
+  // ubicaciones creadas por el usuario
   renderMyPlaces();
 });
 
-// ========== Perfil ==========
+// ==========================
+//       GUARDAR PERFIL
+// ==========================
 async function onSaveProfile(){
   if (!DS.isLoggedIn()) return;
 
@@ -62,25 +68,31 @@ async function onSaveProfile(){
   const city = byId('city').value.trim();
   const bio = byId('bio').value.trim();
   const sportsFav = getMultiSelectValues(byId('sportsFav'));
-  const avatarEl = byId('avatarImg');
-  const avatar = avatarEl?.dataset?.src || ''; // usamos data-src para no depender del src cuando está vacío
+
+  const avatar = byId('avatarImg')?.dataset?.src || '';
 
   try{
-    const updated = await DS.updateUser(id, { name, username, email, city, bio, sportsFav, avatar });
-    alert('Perfil actualizado.');
-    // refrescar saludo
+    const updated = await DS.updateUser(id, {
+      name, username, email, city, bio, sportsFav, avatar
+    });
+
+    showToast("Perfil actualizado correctamente.");
+
     byId('helloUser').textContent = `Hola, ${updated.name || updated.username}`;
-    // opcional: si quieres, sincroniza autor en tus ubicaciones antiguas que no tenían createdBy
-    // migrateOwnedLocationsIfNeeded(updated.id);
-    renderMyPlaces(); // por si cambia el nombre que mostramos al lado de cada punto (no necesario aquí)
+    renderMyPlaces();
+
   }catch(err){
-    alert(err.message || 'No fue posible actualizar el perfil.');
+    showToast(err.message || 'No fue posible actualizar el perfil.', true);
   }
 }
 
+// ==========================
+//         AVATAR
+// ==========================
 function renderAvatar(dataURL){
   const img = byId('avatarImg');
   if (!img) return;
+
   if (dataURL){
     img.src = dataURL;
     img.dataset.src = dataURL;
@@ -88,30 +100,44 @@ function renderAvatar(dataURL){
     img.removeAttribute('src');
     img.dataset.src = '';
   }
+
+  // animación suave
+  img.style.opacity = "0";
+  setTimeout(() => (img.style.opacity = "1"), 40);
 }
 
-function setMultiSelect(selectEl, values){
-  const set = new Set(values || []);
-  Array.from(selectEl.options).forEach(opt => {
-    opt.selected = set.has(opt.value);
-  });
+// ==========================
+//      DEPORTES FAVORITOS
+// ==========================
+function setMultiSelect(select, values){
+  const set = new Set(values);
+  [...select.options].forEach(opt => opt.selected = set.has(opt.value));
 }
-function getMultiSelectValues(selectEl){
-  return Array.from(selectEl.selectedOptions).map(o => o.value);
+
+function getMultiSelectValues(select){
+  return [...select.selectedOptions].map(o => o.value);
 }
+
 function renderSportsPreview(list){
   const cont = byId('sportsPreview');
-  if(!list || !list.length){
-    cont.innerHTML = `<span class="small">Aún no seleccionas deportes.</span>`;
+
+  if (!list.length){
+    cont.innerHTML = `<span class="small" style="opacity:.7">Aún no seleccionas deportes.</span>`;
     return;
   }
-  cont.innerHTML = list.map(s => `<span class="pill">${escapeHtml(s)}</span>`).join('');
+
+  cont.innerHTML = list
+    .map(s => `<span class="pill">${escapeHtml(s)}</span>`)
+    .join('');
 }
 
-// ========== Mis ubicaciones ==========
+// ==========================
+//      MIS UBICACIONES
+// ==========================
 function renderMyPlaces(){
   const userId = DS.getSessionUserId();
   const list = readLS(LS_KEYS.LOCATIONS, []).filter(p => p.createdBy === userId);
+
   const wrap = byId('myPlaces');
   const stats = byId('myStats');
 
@@ -119,24 +145,32 @@ function renderMyPlaces(){
 
   if (!list.length){
     wrap.innerHTML = `
-      <div class="item"><small>No has añadido ubicaciones todavía.</small></div>
+      <div class="item">
+        <small style="opacity:.8">No has añadido ubicaciones todavía.</small>
+      </div>
     `;
     return;
   }
 
-  // ordenar por fecha descendente
   list.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
 
   wrap.innerHTML = list.map(p => `
     <div class="item">
       <div class="item-head">
         <strong>${escapeHtml(p.name)}</strong>
-        <span class="small">${escapeHtml(p.sport)} ${p.schedule ? '· '+escapeHtml(p.schedule) : ''}</span>
+        <span class="small" style="opacity:.85">
+          ${escapeHtml(p.sport)} ${p.schedule ? "· " + escapeHtml(p.schedule) : ""}
+        </span>
       </div>
-      <small>Coords: ${Number(p.lat).toFixed(5)}, ${Number(p.lng).toFixed(5)}</small>
-      ${p.info ? `<small>${escapeHtml(p.info)}</small>` : ''}
+
+      <small style="opacity:.75">
+        Coords: ${Number(p.lat).toFixed(5)}, ${Number(p.lng).toFixed(5)}
+      </small>
+
+      ${p.info ? `<small style="opacity:.85">${escapeHtml(p.info)}</small>` : ''}
+
       <div class="item-actions">
-        <a class="button button--ghost" href="map.html" title="Ver en mapa">Ver en mapa</a>
+        <a class="button button--ghost" href="map.html">Ver en mapa</a>
         <button class="button button--ghost" onclick="deleteMyPlace('${p.id}')">Eliminar</button>
       </div>
     </div>
@@ -150,10 +184,9 @@ function deleteMyPlace(id){
   const i = list.findIndex(x => x.id === id);
   if (i < 0) return;
 
-  // seguridad: verificar autor
   const myId = DS.getSessionUserId();
   if (list[i].createdBy !== myId){
-    alert('Solo puedes eliminar ubicaciones creadas por ti.');
+    showToast("Solo puedes eliminar tus propias ubicaciones.", true);
     return;
   }
 
@@ -162,17 +195,61 @@ function deleteMyPlace(id){
   renderMyPlaces();
 }
 
-// ========== Utils ==========
+// ==========================
+//         UTILS
+// ==========================
 function byId(id){ return document.getElementById(id); }
-function readLS(k, def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def }catch{ return def } }
+
+function readLS(k, def){
+  try { return JSON.parse(localStorage.getItem(k)) ?? def }
+  catch { return def }
+}
+
 function saveLS(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
-function escapeHtml(str){ return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[s])); }
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, s =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[s])
+  );
+}
 
 function fileToDataURL(file){
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = e => resolve(e.target.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+    const r = new FileReader();
+    r.onload = e => resolve(e.target.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
   });
+}
+
+// ==========================
+//      TOAST VISUAL (nuevo)
+// ==========================
+function showToast(msg, error=false){
+  const toast = document.createElement("div");
+  toast.textContent = msg;
+
+  toast.style.position = "fixed";
+  toast.style.bottom = "26px";
+  toast.style.right = "26px";
+  toast.style.padding = "12px 18px";
+  toast.style.borderRadius = "12px";
+  toast.style.fontSize = ".9rem";
+  toast.style.zIndex = "9999";
+  toast.style.color = "#fff";
+  toast.style.background = error
+    ? "rgba(255,80,80,0.85)"
+    : "rgba(70,140,255,0.85)";
+  toast.style.backdropFilter = "blur(8px)";
+  toast.style.boxShadow = "0 6px 16px rgba(0,0,0,.35)";
+  toast.style.opacity = "0";
+  toast.style.transition = "opacity .35s ease";
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => { toast.style.opacity = "1"; }, 20);
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    setTimeout(() => toast.remove(), 400);
+  }, 2300);
 }

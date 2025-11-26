@@ -10,7 +10,6 @@
   <!-- DataService: sesión y usuarios -->
   <script src="js/dataService.js"></script>
   <script>
-    // Guardia de acceso: si no hay sesión, ir a auth
     document.addEventListener('DOMContentLoaded', () => {
       if (!DS.isLoggedIn()) {
         location.href = 'auth.html';
@@ -20,83 +19,263 @@
   </script>
 
   <style>
-    /* Estilos locales coherentes con tu línea visual */
-    .profile-wrap{
-      max-width: 1080px; margin: 20px auto; padding: 16px;
+    /* ================================
+       ESTILO GENERAL DEL PERFIL
+    =================================*/
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #3b4cca, #7c5cff, #aa64ff);
+      min-height: 100vh;
+      padding-bottom: 40px;
+      color: #fff;
     }
+
+    /* ================================
+       BARRA SUPERIOR (ESTILO PREMIUM)
+    =================================*/
     .top-mini{
-      display:flex; align-items:center; justify-content:space-between;
-      gap:10px; padding:10px 14px;
-      background: linear-gradient(90deg, rgba(111,179,255,.92), rgba(139,123,255,.92));
-      border-bottom:1px solid rgba(255,255,255,.18);
-      backdrop-filter: blur(8px);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:14px 18px;
+      background: rgba(25,30,60,0.65);
+      border-bottom:1px solid rgba(255,255,255,0.22);
+      backdrop-filter: blur(16px);
+      box-shadow:0 8px 22px rgba(0,0,0,.35);
+      animation: slideDown .45s both;
     }
-    .top-mini .left{ display:flex; align-items:center; gap:10px }
-    .top-mini a{ color:#fff; text-decoration:none; font-weight:600 }
-    .btn-logout{ padding:.45rem .75rem; border-radius:10px; }
+
+    @keyframes slideDown {
+      from {opacity:0; transform:translateY(-18px);}
+      to   {opacity:1; transform:translateY(0);}
+    }
+
+    .top-mini strong{
+      font-size:1.1rem;
+      font-weight:700;
+    }
+
+    .top-mini a{
+      color:#fff;
+      font-weight:600;
+      text-decoration:none;
+      padding:.45rem .9rem;
+      background: rgba(255,255,255,0.15);
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.28);
+      transition:.2s;
+    }
+
+    .top-mini a:hover{
+      background: rgba(255,255,255,0.27);
+      transform:translateY(-2px);
+    }
+
+    .btn-logout{
+      background:rgba(255,255,255,0.15);
+      border:1px solid rgba(255,255,255,0.25);
+      color:white;
+      font-weight:600;
+      transition:.2s;
+    }
+
+    .btn-logout:hover{
+      background:rgba(255,255,255,0.30);
+      transform:translateY(-2px);
+    }
+
+    /* ================================
+       CONTENEDOR PRINCIPAL
+    =================================*/
+    .profile-wrap{
+      max-width:1150px;
+      margin: 30px auto;
+      padding: 20px;
+    }
 
     .grid{
-      display:grid; grid-template-columns: 1.2fr .8fr; gap:16px; margin-top:16px;
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:22px;
     }
-    @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
+    @media (max-width:980px){
+      .grid{grid-template-columns:1fr;}
+    }
 
+    /* ================================
+       TARJETAS (GLASSMORPHISM)
+    =================================*/
     .card{
-      background: var(--panel-bg);
-      border:1px solid var(--panel-border);
-      border-radius: 16px;
-      padding: 16px;
-      box-shadow: var(--panel-shadow);
-      backdrop-filter: blur(var(--panel-blur));
-    }
-    .card h2{ margin:0 0 10px; }
-    .muted{ color:#cfe5f0; opacity:.9 }
-    .row{ display:grid; gap:10px; margin-bottom:10px }
-    .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px }
-    .small{ font-size:.9rem; opacity:.9 }
-    .pill{
-      display:inline-block; padding:.35rem .6rem; border-radius:999px;
-      background: rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.22);
-      font-size:.85rem; margin: 2px 6px 2px 0;
+      background: rgba(255,255,255,0.10);
+      border:1px solid rgba(255,255,255,0.25);
+      border-radius:18px;
+      padding:22px;
+      box-shadow:0 12px 22px rgba(0,0,0,.35);
+      backdrop-filter: blur(16px);
+      animation: fadeIn .45s both;
     }
 
+    @keyframes fadeIn{
+      from{opacity:0; transform:scale(.96);}
+      to{opacity:1; transform:scale(1);}
+    }
+
+    .card h2{
+      margin-top:0;
+      font-weight:700;
+      margin-bottom:4px;
+    }
+
+    .muted{
+      opacity:.85;
+      margin-bottom:12px;
+      line-height:1.4;
+    }
+
+    /* ================================
+       AVATAR
+    =================================*/
     .avatar{
-      width: 88px; height: 88px; border-radius: 18px; object-fit: cover;
-      border:1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.08);
+      width: 92px;
+      height: 92px;
+      border-radius:18px;
+      object-fit:cover;
+      border: 1px solid rgba(255,255,255,.25);
+      background: rgba(255,255,255,.08);
+      box-shadow:0 6px 14px rgba(0,0,0,.35);
     }
-    .avatar-row{ display:flex; align-items:center; gap:12px }
 
-    .list{
-      display:grid; gap:10px; margin-top:10px;
+    .avatar-row{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      margin-bottom:10px;
     }
+
+    /* ================================
+       INPUTS Y SELECTS
+    =================================*/
+    .input, .select, textarea{
+      width:100%;
+      padding:.65rem .8rem;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.12);
+      color:white;
+      font-size:.92rem;
+      backdrop-filter: blur(6px);
+      transition:.22s;
+      font-family:"Poppins";
+    }
+
+    .input:focus, .select:focus, textarea:focus{
+      border-color:#b9d8ff;
+      box-shadow:0 0 0 3px rgba(111,179,255,.45);
+      outline:none;
+    }
+
+    .row, .row2{
+      margin-top:12px;
+      display:grid;
+      gap:12px;
+    }
+
+    .row2{
+      grid-template-columns:1fr 1fr;
+    }
+    @media(max-width:600px){
+      .row2{grid-template-columns:1fr;}
+    }
+
+    textarea{
+      resize:none;
+      height:80px;
+    }
+
+    /* ================================
+       BOTÓN GUARDAR
+    =================================*/
+    .button{
+      background:linear-gradient(135deg, #4e73ff, #8c68ff);
+      border:none;
+      color:white;
+      padding:.6rem 1.3rem;
+      font-weight:600;
+      border-radius:12px;
+      cursor:pointer;
+      transition:.22s;
+    }
+
+    .button:hover{
+      transform:translateY(-2px);
+      opacity:.92;
+    }
+
+    .button--ghost{
+      background:rgba(255,255,255,0.18);
+      border:1px solid rgba(255,255,255,0.25);
+    }
+
+    /* ================================
+       LISTA DE UBICACIONES
+    =================================*/
+    .list{
+      display:grid; gap:12px; margin-top:16px;
+    }
+
     .item{
       border:1px solid rgba(255,255,255,.18);
       background: rgba(255,255,255,.06);
-      border-radius: 12px;
-      padding: 10px;
+      border-radius:12px;
+      padding:12px;
       display:grid; gap:6px;
     }
-    .item-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
-    .item-actions{ display:flex; gap:8px; flex-wrap:wrap }
-    .item small{ opacity:.9 }
+
+    .item-head{
+      display:flex; justify-content:space-between; align-items:center;
+    }
+
+    .item-actions{
+      display:flex; gap:8px; flex-wrap:wrap;
+    }
+
+    .pill{
+      display:inline-block;
+      padding:.35rem .6rem;
+      border-radius:999px;
+      background: rgba(255,255,255,.15);
+      border:1px solid rgba(255,255,255,.23);
+      font-size:.85rem;
+      margin: 2px 4px 2px 0;
+    }
+
   </style>
 </head>
+
 <body>
 
-  <!-- Barra mini -->
+  <!-- BARRA SUPERIOR -->
   <header class="top-mini">
     <div class="left">
-      <a href="index.html">← Menú</a>
+      <a href="index.html">⬅ Volver</a>
       <strong>Mi perfil</strong>
     </div>
+
     <div class="right">
       <span id="helloUser" class="small">Hola, Usuario</span>
       <button id="btnLogout" class="button button--ghost btn-logout">Cerrar sesión</button>
     </div>
   </header>
 
+
+  <!-- CONTENIDO -->
   <main class="profile-wrap">
     <section class="grid">
-      <!-- PERFIL -->
+
+      <!-- ===============================
+           TARJETA - DATOS DE PERFIL
+      ================================-->
       <article class="card">
         <h2>Datos de perfil</h2>
         <p class="muted">Actualiza tu información pública. Los demás podrán ver tu nombre, ciudad y deportes favoritos.</p>
@@ -108,18 +287,18 @@
               <span>Cambiar avatar</span>
               <input id="avatarInput" type="file" accept="image/*" class="input" style="padding:.4rem"/>
             </label>
-            <p class="small">Se guardará localmente (fase demo).</p>
+            <p class="small" style="opacity:.8;">Se guardará localmente (fase demo).</p>
           </div>
         </div>
 
-        <div class="row2" style="margin-top:10px">
+        <div class="row2">
           <label>
             <span>Nombre para mostrar</span>
             <input id="name" class="input" placeholder="Tu nombre"/>
           </label>
           <label>
             <span>Usuario</span>
-            <input id="username" class="input" placeholder="usuario" />
+            <input id="username" class="input" placeholder="usuario"/>
           </label>
         </div>
 
@@ -137,14 +316,14 @@
         <div class="row">
           <label>
             <span>Biografía</span>
-            <textarea id="bio" class="input" rows="3" placeholder="Cuéntanos brevemente sobre ti…"></textarea>
+            <textarea id="bio" class="input" placeholder="Cuéntanos brevemente sobre ti…"></textarea>
           </label>
         </div>
 
         <div class="row">
           <label>
             <span>Deportes favoritos</span>
-            <select id="sportsFav" class="select" multiple size="6" title="Selecciona uno o más">
+            <select id="sportsFav" class="select" multiple size="6">
               <option>Fútbol</option>
               <option>Baloncesto</option>
               <option>Voleibol</option>
@@ -158,29 +337,35 @@
           <div id="sportsPreview" class="small"></div>
         </div>
 
-        <div class="form-buttons">
+        <div class="form-buttons" style="margin-top:14px">
           <button id="btnSaveProfile" class="button">Guardar cambios</button>
         </div>
       </article>
 
-      <!-- MIS UBICACIONES -->
+
+      <!-- ===============================
+           TARJETA - MIS UBICACIONES
+      ================================-->
       <article class="card">
         <h2>Mis ubicaciones</h2>
         <p class="muted">Lugares añadidos por ti. Solo tú puedes eliminarlos.</p>
 
-        <div id="myStats" class="small" style="margin:8px 0"></div>
+        <div id="myStats" class="small"></div>
         <div id="myPlaces" class="list"></div>
       </article>
+
     </section>
   </main>
 
+
   <script src="js/profile.js"></script>
+
   <script>
-    // Cerrar sesión
     document.getElementById('btnLogout')?.addEventListener('click', () => {
       DS.clearSession();
       location.href = 'auth.html';
     });
   </script>
+
 </body>
 </html>

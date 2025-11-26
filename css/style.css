@@ -1,350 +1,542 @@
-/* === Deporte Conecta · Estilos unificados (rediseño moderno) === */
+/* === Deporte Conecta · Estilos unificados — Rediseño moderno 2025 === */
+
+/* ---- Variables globales ---- */
 :root{
-  /* Nueva paleta deportiva moderna */
   --c-grad-a: #6fb3ff;
   --c-grad-b: #8b7bff;
   --c-accent: #ff8364;
 
   --c-card: rgba(255,255,255,0.08);
-  --c-border: rgba(255,255,255,0.18);
+  --c-border: rgba(255,255,255,0.20);
+
   --c-text: #ffffff;
   --c-text-dim: #d8e6eb;
 
   --radius: 16px;
-  --shadow: 0 10px 30px rgba(0,0,0,.25);
+  --shadow: 0 10px 32px rgba(0,0,0,.28);
 
-  /* Paneles y modales */
-  --panel-bg: rgba(15, 20, 35, 0.9);
+  --panel-bg: rgba(18, 22, 36, 0.92);
   --panel-border: rgba(255,255,255,0.22);
   --panel-shadow: 0 18px 50px rgba(0,0,0,0.45);
-  --panel-blur: 12px;
-  --modal-backdrop: rgba(0,0,0,.55);
+  --panel-blur: 14px;
 }
 
-*{ box-sizing:border-box }
-html,body{ height:100% }
-body{
+/* --------- Reset & fuente --------- */
+*{ box-sizing:border-box; }
+
+html,body{
+  height:100%;
   margin:0;
-  color:var(--c-text);
-  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+body{
+  font-family:'Poppins', system-ui, sans-serif;
   background: linear-gradient(135deg, var(--c-grad-a), var(--c-grad-b));
-  min-height:100%;
+  color:var(--c-text);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* === Elementos generales === */
-.header-small{ text-align:center; padding:24px 16px }
-.header-small .back{ position:absolute; left:16px; top:20px; color:#fff; text-decoration:none; opacity:.9 }
-
-.card{
-  background: var(--c-card);
-  border: 1px solid var(--c-border);
-  border-radius: var(--radius);
-  padding: 16px;
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(6px);
-}
-
-/* === Botones === */
+/* -------------------- Botones -------------------- */
 .button{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  padding:.75rem 1rem;
-  border-radius:14px;
-  border:none;
+  padding:.70rem 1rem;
+  border-radius: 12px;
+  border: none;
+
   background: linear-gradient(135deg, var(--c-grad-a), var(--c-grad-b));
   color:#fff;
-  font-weight:700;
+  font-weight:600;
+  letter-spacing: .2px;
   cursor:pointer;
-  text-decoration:none;
-  transition: transform .12s ease, filter .18s ease;
+
+  transition: transform .15s ease, opacity .18s ease;
   box-shadow: var(--shadow);
 }
-.button:hover{ transform: translateY(-1px); filter: brightness(1.08); }
+
+.button:hover{
+  transform: translateY(-2px);
+  opacity:.95;
+}
 
 .button--ghost{
-  background:transparent;
-  color:#fff;
-  border:1px solid var(--c-border);
+  background: rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.25);
   box-shadow:none;
 }
+
 .button--ghost:hover{
-  background: rgba(255,255,255,.1);
-  border-color: rgba(255,255,255,.3);
+  background: rgba(255,255,255,.18);
 }
 
-/* Botón acento coral */
 .button--accent{
-  background: linear-gradient(135deg, var(--c-accent), #ff9d7e);
-  color:#201a1a;
-  border:none;
-  box-shadow: 0 10px 26px rgba(255,131,100,.35);
+  background: linear-gradient(135deg, var(--c-accent), #ffa78d);
+  color:#201d1d;
+  font-weight:700;
 }
-.button--accent:hover{ filter: brightness(1.05); }
 
-/* === Inputs y selects === */
-.input,.select{
+.button--accent:hover{
+  opacity:.92;
+}
+
+/* -------------------- Inputs -------------------- */
+.input, .select{
   width:100%;
-  padding:.7rem .9rem;
-  border-radius:12px;
-  border:1px solid var(--c-border);
-  background: rgba(0,0,0,.25);
-  color:#fff;
+  padding:.75rem .9rem;
+  border-radius: 12px;
+
+  background: rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.25);
+  color:white;
+
   outline:none;
-}
-.input:focus,.select:focus{
-  border-color:#9ec9ff;
-  box-shadow:0 0 0 3px rgba(111,179,255,.3);
-}
-
-/* === Menú principal === */
-.menu-container{
-  display:grid;
-  gap:20px;
-  grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
-  padding:24px;
-}
-.menu-card{
-  background:var(--c-card);
-  border:1px solid var(--c-border);
-  border-radius:var(--radius);
-  padding:20px;
-}
-.menu-card h3{ margin:0 0 8px; }
-.menu-card p{ margin:0 0 16px; color:var(--c-text-dim); }
-
-/* === Mapa === */
-.map-body{ height:100vh; display:flex; flex-direction:column; }
-.map{ flex:1; min-height:60vh; }
-
-/* === Barra superior compacta === */
-.top-bar{
-  display:flex;
-  gap:8px;
-  align-items:center;
-  justify-content:space-between;
-  padding:6px 12px;
-  background: linear-gradient(90deg, rgba(111,179,255,.9), rgba(139,123,255,.9));
-  backdrop-filter: blur(8px);
-  border-bottom:1px solid var(--c-border);
-}
-.top-bar .back{
-  color:#fff;
-  text-decoration:none;
-  font-weight:600;
   font-size:.95rem;
 }
+
+.input:focus, .select:focus{
+  border-color:#aee0ff;
+  box-shadow:0 0 0 3px rgba(111,179,255,.35);
+}
+
+/* ============================================================
+                       MAPA / TOP BAR
+   ============================================================ */
+
+.map-body{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+.map{
+  flex:1;
+  min-height:60vh;
+}
+
+/* ============================================================
+   TOP BAR — NUEVO ESTILO 2025
+   ============================================================ */
+
+.top-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+
+  padding:14px 18px;
+  border-bottom:1px solid rgba(255,255,255,0.18);
+
+  background: linear-gradient(135deg, var(--c-grad-a), var(--c-grad-b));
+  backdrop-filter: blur(14px);
+
+  border-radius: 0 0 18px 18px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.28);
+
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Contenedores internos */
 .top-bar .filters{
   display:flex;
-  gap:6px;
-  align-items:center;
   flex-wrap:wrap;
-  flex:1;
-  min-width:0;
-}
-.top-bar .select, .top-bar .input{
-  padding:.5rem .7rem;
-  border-radius:10px;
-  background: rgba(0,0,0,.2);
-  font-size:.9rem;
-  flex:1 1 140px;
-  max-width:200px;
-}
-.top-bar #searchText{
-  flex:2 1 200px;
-  max-width:260px;
-}
-.top-bar .button{
-  padding:.55rem .8rem;
-  border-radius:10px;
-  font-size:.88rem;
+  align-items:center;
+  gap:10px;
 }
 
-/* === Panel flotante === */
+/* Inputs y selects dentro del top bar */
+.top-bar .input,
+.top-bar .select{
+  background: rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.28);
+  border-radius:12px;
+
+  color:white;
+  font-weight:500;
+  font-size:.92rem;
+
+  padding:.65rem .9rem;
+  box-shadow:none;
+}
+
+/* Hover suave */
+.top-bar .input:hover,
+.top-bar .select:hover{
+  background: rgba(255,255,255,.22);
+}
+
+/* Botones dentro del top-bar */
+.top-bar .button{
+  border-radius:12px;
+  padding:.60rem 1rem;
+  font-size:.88rem;
+  font-weight:600;
+  box-shadow:none;
+}
+
+.top-bar .button--ghost{
+  background: rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.25);
+}
+.top-bar .button--ghost:hover{
+  background: rgba(255,255,255,.18);
+}
+
+/* Botón Volver */
+.top-bar .back{
+  background: rgba(255,255,255,.20);
+  border:1px solid rgba(255,255,255,.30);
+
+  padding:8px 14px;
+  border-radius:14px;
+  font-size:.95rem;
+  color:white;
+
+  backdrop-filter: blur(8px);
+  transition: all .18s ease;
+}
+
+.top-bar .back:hover{
+  background:rgba(255,255,255,.32);
+  border-color:rgba(255,255,255,.45);
+  transform: translateY(-2px);
+}
+
+/* Texto de saludo */
+#topUser{
+  color:white;
+  font-weight:700;
+}
+
+
+/* ============================================================
+                     AUTOCOMPLETADO — BUSCADOR
+   ============================================================ */
+
+.search-results{
+  position:absolute;
+  margin-top:4px;
+
+  background:rgba(18,22,36,0.97);
+  border:1px solid rgba(255,255,255,0.22);
+  border-radius:14px;
+
+  width:260px;
+  max-height:240px;
+  overflow-y:auto;
+  z-index:2000;
+  list-style:none;
+  padding:0;
+
+  backdrop-filter:blur(10px);
+}
+
+.search-results li{
+  padding:10px 14px;
+  cursor:pointer;
+  border-bottom:1px solid rgba(255,255,255,.12);
+  transition:background .15s ease;
+}
+
+.search-results li:hover{
+  background:rgba(255,255,255,.15);
+}
+
+/* ============================================================
+                     PANEL FLOTANTE (AÑADIR)
+   ============================================================ */
+
 .floating-panel{
   position: fixed;
-  right: 16px;
-  bottom: 16px;
-  max-width: 520px;
-  z-index: 1000;
-  background: var(--panel-bg);
-  color: #f4fbff;
-  border: 1px solid var(--panel-border);
-  box-shadow: var(--panel-shadow);
+  right:16px;
+  bottom:16px;
+  max-width:500px;
+
+  padding:18px;
+  border-radius:16px;
+
+  background:var(--panel-bg);
+  border:1px solid var(--panel-border);
+  box-shadow:var(--panel-shadow);
   backdrop-filter: blur(var(--panel-blur));
-  border-radius: var(--radius);
-  padding: 16px;
-}
-.floating-panel h2{ margin:0 0 10px; font-size:1.35rem; text-shadow:0 1px 0 rgba(0,0,0,.25); }
-.floating-panel p{ margin:6px 0 14px; color:#cfe5f0; }
-.floating-panel .input,.floating-panel .select{
-  background: rgba(255,255,255,0.11);
-  border:1px solid rgba(255,255,255,0.22);
-}
-.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.grid2 label{ display:flex; flex-direction:column; gap:6px; font-size:.95rem; }
-.form-buttons{ display:flex; gap:10px; justify-content:flex-end; margin-top:10px; }
 
-/* === Modal === */
-.modal[hidden]{ display:none; }
-.modal{
-  position: fixed;
-  inset: 0;
-  z-index: 1100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  overflow-y: auto;
-}
-.modal-backdrop{
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  z-index: 0;
-}
-.modal-card{
-  position: relative;
-  width: min(720px, 95%);
-  max-height: 90vh;
-  overflow-y: auto;
-  background: rgba(15,20,35,.94);
-  border: 1px solid rgba(255,255,255,.25);
-  border-radius: 16px;
-  padding: 20px 18px 24px;
-  box-shadow: 0 20px 60px rgba(0,0,0,.5);
-  backdrop-filter: blur(10px);
-  color: #f4fbff;
-}
-.modal-head{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
-  position: sticky;
-  top: 0;
-  background: rgba(15,20,35,.94);
-  padding-top: 5px;
-  padding-bottom: 8px;
-  z-index: 5;
-}
-#infoClose{
-  flex-shrink: 0;
-  font-weight: 600;
-  border-radius: 10px;
-  padding: 6px 12px;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.25);
-  color: #fff;
-}
-#infoClose:hover{
-  background: rgba(255,255,255,0.25);
-  transform: none;
+  color:var(--c-text-dim);
+  z-index:1000;
 }
 
-/* === Popups Leaflet === */
-.leaflet-popup-content-wrapper{
-  border-radius: 16px !important;
-  border: 1px solid rgba(255,255,255,.25);
-  box-shadow: 0 16px 40px rgba(0,0,0,.35);
-  background: rgba(15,20,35,.95) !important;
-  backdrop-filter: blur(10px);
-  color: #f4fbff;
-}
-.leaflet-popup-tip{
-  background: rgba(15,20,35,.95) !important;
-  border: 1px solid rgba(255,255,255,.25);
+.grid2{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:12px;
 }
 
-/* === Panel lateral (Favoritos / Cerca de mí) === */
-.side-panel[hidden],
-.near-panel[hidden]{ display:none; }
+/* ============================================================
+                        PANEL LATERAL
+   ============================================================ */
 
-.side-panel, .near-panel{
-  position: fixed;
-  top: 80px;
-  right: 16px;
-  bottom: 16px;
-  width: 360px;
-  z-index: 1000;
-  background: rgba(15, 20, 35, 0.94);
-  border: 1px solid rgba(255,255,255,0.22);
-  border-radius: 16px;
-  box-shadow: 0 18px 50px rgba(0,0,0,.45);
+.side-panel{
+  position:fixed;
+  top:82px;
+  right:16px;
+  bottom:16px;
+  width:360px;
+
+  background:var(--panel-bg);
+  border:1px solid var(--panel-border);
+  border-radius:16px;
+
+  padding:14px;
+  box-shadow:var(--panel-shadow);
   backdrop-filter: blur(12px);
-  display: flex;
-  flex-direction: column;
-  padding: 12px;
+
+  display:flex;
+  flex-direction:column;
+  z-index:1000;
 }
 
-/* === Responsive === */
-@media (max-width:900px){
-  .side-panel, .near-panel{
-    width: calc(100% - 32px);
-    left:16px; right:16px; top:76px;
-  }
-}
-@media (max-width:640px){
-  .floating-panel{ left:16px; right:16px; max-width:none; }
-}
-/* ===== Panel "Cerca de mí" ===== */
-.near-panel[hidden]{ display:none }
+.side-panel[hidden]{ display:none; }
+
+/* ============================================================
+         PANEL CERCA DE MÍ — VERSION REPARADA Y MEJORADA
+   ============================================================ */
+
 .near-panel{
-  position: fixed;
-  right: 16px;
-  top: 84px;
-  width: 380px;
-  z-index: 1000;
-  background: rgba(20, 26, 40, 0.94);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 16px;
-  box-shadow: 0 18px 40px rgba(0,0,0,.45);
+  position:fixed;
+  right:16px;
+  top:108px;
+
+  width:380px;
+
+  background: rgba(25, 30, 48, 0.96);
+  color: #ffffff;
+
+  border:1px solid rgba(255,255,255,0.32);
+  border-radius:16px;
+
+  padding:18px;
+
+  box-shadow:0 22px 55px rgba(0,0,0,.55);
   backdrop-filter: blur(12px);
-  color: #f4fbff;
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+
+  z-index:1200;
+}
+
+/* Forzar que hidden funcione SIEMPRE */
+.near-panel[hidden]{
+  display:none !important;
 }
 
 .near-head{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid rgba(255,255,255,0.15);
-  padding-bottom: 8px;
-  margin-bottom: 8px;
-}
-
-.near-head h3{
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 700;
-}
-
-.near-section{
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding-bottom:10px;
+  border-bottom:1px solid rgba(255,255,255,0.22);
+  color:white;
 }
 
 .near-buttons{
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  display:flex;
+  gap:10px;
 }
 
 .near-actions{
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 6px;
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
 }
 
-.near-hint{
-  font-size: 0.9rem;
-  opacity: 0.85;
-  line-height: 1.4;
-  margin-top: 6px;
+.near-panel label{
+  font-weight:600;
+  color:white;
+}
+
+/* ============================================================
+                            MODAL
+   ============================================================ */
+
+.modal[hidden]{ display:none; }
+
+.modal{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:1100;
+}
+
+.modal-backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.55);
+}
+
+.modal-card{
+  position:relative;
+  width:min(720px,95%);
+  max-height:90vh;
+
+  background:rgba(18,22,36,.96);
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:16px;
+  padding:20px;
+
+  overflow-y:auto;
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(12px);
+}
+
+/* ============================================================
+                         POPUPS LEAFLET
+   ============================================================ */
+
+.leaflet-popup-content-wrapper{
+  border-radius:16px !important;
+  background:rgba(18,22,36,.96) !important;
+  border:1px solid rgba(255,255,255,.25);
+  color:white;
+  backdrop-filter:blur(10px);
+}
+
+.leaflet-popup-tip{
+  background:rgba(18,22,36,.96) !important;
+}
+
+/* --- Responsive --- */
+@media(max-width:900px){
+  .side-panel,
+  .near-panel{
+    width: calc(100% - 32px);
+    left:16px; right:16px;
+  }
+}
+
+@media(max-width:640px){
+  .floating-panel{
+    left:16px;
+    right:16px;
+    max-width:none;
+  }
+}
+
+/* ============================================================
+   CATÁLOGO — NUEVO DISEÑO OSCURO Y FLUIDO
+   ============================================================ */
+
+.catalog-body{
+  background: linear-gradient(135deg,#1e2235,#262b44,#323b78);
+  min-height:100vh;
+  color:#e9f1ff;
+  font-family:'Poppins', sans-serif;
+}
+
+.catalog-header{
+  padding:26px 40px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  animation: fadeIn .4s ease-out;
+}
+
+.catalog-title{
+  margin:0;
+  font-size:2.6rem;
+  font-weight:700;
+  letter-spacing:1px;
+}
+
+.back-animated{
+  width:max-content;
+  display:flex;
+  align-items:center;
+  gap:8px;
+
+  background:rgba(255,255,255,.12);
+  padding:10px 16px;
+
+  border-radius:14px;
+  text-decoration:none;
+  color:#fff;
+  font-weight:600;
+
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.20);
+
+  transition:all .22s ease;
+}
+
+.back-animated:hover{
+  background:rgba(255,255,255,.25);
+  border-color:rgba(255,255,255,.40);
+  transform:translateX(-4px);
+}
+
+.back-animated .arrow{
+  font-size:1.3rem;
+}
+
+.catalog-content{
+  max-width:900px;
+  margin:auto;
+  padding:20px 40px 60px;
+  display:flex;
+  flex-direction:column;
+  gap:36px;
+}
+
+.sport-card{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:20px;
+
+  padding:22px 26px;
+
+  backdrop-filter:blur(6px);
+  transition:transform .2s ease, background .25s;
+}
+
+.sport-card:hover{
+  background:rgba(255,255,255,.12);
+  transform:translateY(-4px);
+}
+
+.sport-card h3{
+  margin-top:0;
+  font-size:1.6rem;
+  font-weight:700;
+  color:#fff;
+}
+
+.sport-card p{
+  line-height:1.6;
+  margin-bottom:18px;
+  color:#dbe7ff;
+}
+
+.sport-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+}
+
+.catalog-footer{
+  text-align:center;
+  padding:20px 0;
+  opacity:.75;
+  font-size:.9rem;
+}
+
+/* Animación aparición */
+.fadeIn{
+  animation:fadeIn .45s ease-out;
+}
+
+@keyframes fadeIn{
+  from{ opacity:0; transform:translateY(15px); }
+  to{ opacity:1; transform:translateY(0); }
 }

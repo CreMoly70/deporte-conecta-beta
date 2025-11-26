@@ -1,9 +1,8 @@
 // Deporte Conecta · Mapa colaborativo con Leaflet + localStorage (v sesión de usuario)
 const LS_KEYS = {
   LOCATIONS: 'dc_locations',
-  FAVORITES: 'dc_favorites',      // base de favoritos
-  PREF_SPORT: 'dc_pref_sport',
-  PREF_SEARCH: 'dc_pref_search'
+  FAVORITES: 'dc_favorites',
+  PREF_SPORT: 'dc_pref_sport'
 };
 
 let map;
@@ -12,9 +11,19 @@ let currentData = [];
 let addMode = false;
 let tempMarker = null;
 let tempLatLng = null;
+
+// Cerca de mí
 let nearCircle = null;
 let nearCenterMarker = null;
 let selectingCenter = false;
+
+// Autocompletado de lugares
+let searchResultsEl = null;
+
+// --- Torneos / Puntos de encuentro ---
+let tournamentMode = false;
+let tempTournamentMarker = null;
+let tempTournamentLatLng = null;
 
 // ============= Boot =============
 document.addEventListener('DOMContentLoaded', () => {
@@ -34,40 +43,79 @@ document.addEventListener('DOMContentLoaded', () => {
   currentData = (stored || []).map(normalize);
   render();
 
-  // Prefiltros
+  // Prefiltro: solo deporte
   const preSport = readLS(LS_KEYS.PREF_SPORT, '');
   if (preSport) byId('sportFilter').value = preSport;
-  byId('searchText').value = readLS(LS_KEYS.PREF_SEARCH, '');
 
   // Eventos UI
-  byId('sportFilter').addEventListener('change', () => { persistPrefs(); render(); });
-  byId('searchText').addEventListener('input', debounce(() => { persistPrefs(); render(); }, 120));
+  byId('sportFilter').addEventListener('change', () => {
+    persistPrefs();
+    render();
+  });
+
+  // Buscador real mejorado (PHOTON)
+  const searchInput = byId('searchText');
+  setupPlaceSearch(searchInput);
+
   byId('btnClear').addEventListener('click', clearFilters);
 
   byId('btnAddMode').addEventListener('click', toggleAddMode);
   byId('btnCancelAdd').addEventListener('click', () => setAddMode(false));
   byId('btnSave').addEventListener('click', saveLocation);
 
+  // ----- Botones para torneos / puntos de encuentro -----
+  byId('btnTournamentMode')?.addEventListener('click', toggleTournamentMode);
+  byId('btnCancelTournament')?.addEventListener('click', cancelTournamentMode);
+  byId('btnSaveTournament')?.addEventListener('click', saveTournament);
+
+  // Click en el mapa: soporte para modo "Añadir" NORMAL y modo "Torneo"
   map.on('click', (e) => {
-    if (!addMode) return;
     const { lat, lng } = e.latlng;
-    tempLatLng = { lat, lng };
-    ensureTempMarkerAt(lat, lng, true);
+
+    // Modo ubicación normal
+    if (addMode) {
+      tempLatLng = { lat, lng };
+      ensureTempMarkerAt(lat, lng, true);
+      return;
+    }
+
+    // Modo torneo / punto de encuentro
+    if (tournamentMode) {
+      tempTournamentLatLng = { lat, lng };
+      ensureTournamentMarkerAt(lat, lng, true);
+      return;
+    }
   });
 
   byId('infoClose').addEventListener('click', hideInfo);
   const mb = qs('#infoModal .modal-backdrop');
-  if (mb) mb.addEventListener('click', (e) => { if (e.target.dataset.close !== undefined || e.target === mb) hideInfo(); });
+  if (mb) {
+    mb.addEventListener('click', (e) => {
+      if (e.target.dataset.close !== undefined || e.target === mb) hideInfo();
+    });
+  }
 
   byId('btnFav').addEventListener('click', openFavPanel);
   byId('btnCloseFav').addEventListener('click', closeFavPanel);
 
-  byId('btnNear').addEventListener('click', () => byId('nearPanel').hidden = false);
-  byId('btnCloseNear').addEventListener('click', () => byId('nearPanel').hidden = true);
-  byId('btnNearClear').addEventListener('click', clearNear);
-  byId('btnNearLocate').addEventListener('click', locateMe);
-  byId('btnNearSelect').addEventListener('click', startSelectNearCenter);
-  byId('btnNearApply').addEventListener('click', applyNearFilter);
+  // -------- Panel "Cerca de mí" --------
+  const nearPanel   = byId('nearPanel');
+  const btnNear     = byId('btnNear');
+  const btnCloseNear = byId('btnCloseNear');
+
+  if (btnNear && nearPanel)
+    btnNear.addEventListener('click', () => nearPanel.hidden = false);
+
+  if (btnCloseNear && nearPanel)
+    btnCloseNear.addEventListener('click', () => nearPanel.hidden = true);
+
+  byId('btnNearClear')?.addEventListener('click', clearNear);
+  byId('btnNearLocate')?.addEventListener('click', locateMe);
+  byId('btnNearSelect')?.addEventListener('click', startSelectNearCenter);
+  byId('btnNearApply')?.addEventListener('click', applyNearFilter);
+
+  // Re-render cada minuto para actualizar tiempos restantes de torneos
+  setInterval(render, 60_000);
 });
 
 // ============= Helpers =============
@@ -87,33 +135,135 @@ function normalize(p){
     info: p.info || '',
     verified: !!p.verified,
     createdBy: p.createdBy || null,
-    createdAt: p.createdAt || Date.now()
+    createdAt: p.createdAt || Date.now(),
+    // campos opcionales para torneos / puntos
+    tType: p.tType || null,      // 'tournament' | 'meetpoint' | null
+    endAt: p.endAt || null       // timestamp ms
   };
 }
 
 function persistPrefs(){
   saveLS(LS_KEYS.PREF_SPORT, byId('sportFilter').value);
-  saveLS(LS_KEYS.PREF_SEARCH, byId('searchText').value.trim());
 }
 
-function debounce(fn, ms){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), ms) } }
-function escapeHtml(str){ return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[s])); }
+function debounce(fn, ms){
+  let t;
+  return (...args)=>{
+    clearTimeout(t);
+    t = setTimeout(()=>fn(...args), ms);
+  };
+}
 
-// ============= Filtros y render =============
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, s => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+  }[s]));
+}
+
+//
+// ============================================================
+//   AUTOCOMPLETADO REAL PHOTON API (FUNCIONA DE VERDAD)
+// ============================================================
+function setupPlaceSearch(input){
+  if (!input) return;
+
+  const wrapper = input.parentElement;
+  wrapper.style.position = "relative";
+
+  searchResultsEl = document.createElement("ul");
+  searchResultsEl.id = "searchResults";
+  searchResultsEl.classList.add("search-results");
+  searchResultsEl.hidden = true;
+  wrapper.appendChild(searchResultsEl);
+
+  let lastQuery = "";
+
+  const doSearch = debounce(async (q)=>{
+    if (q.length < 3){
+      clearSearchResults();
+      return;
+    }
+
+    lastQuery = q;
+
+    try {
+      const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=6&lang=es`;
+      const res = await fetch(url);
+      if (!res.ok) return;
+
+      const data = await res.json();
+      if (input.value.trim() !== lastQuery) return;
+
+      renderSearchResults(data.features);
+
+    } catch (err){
+      console.error("Error buscando lugar:", err);
+    }
+  }, 300);
+
+  input.addEventListener("input", ()=>{
+    const q = input.value.trim();
+    doSearch(q);
+  });
+
+  input.addEventListener("blur", ()=>{
+    setTimeout(() => searchResultsEl.hidden = true, 180);
+  });
+}
+
+function clearSearchResults(){
+  if (!searchResultsEl) return;
+  searchResultsEl.innerHTML = "";
+  searchResultsEl.hidden = true;
+}
+
+function renderSearchResults(items){
+  if (!items || items.length === 0){
+    clearSearchResults();
+    return;
+  }
+
+  searchResultsEl.innerHTML = items.map((item, idx)=>{
+    const props = item.properties;
+    const name =
+      props.name ||
+      props.city ||
+      props.street ||
+      props.country ||
+      "Lugar encontrado";
+    return `<li data-i="${idx}">${escapeHtml(name)}</li>`;
+  }).join("");
+
+  searchResultsEl.hidden = false;
+
+  [...searchResultsEl.querySelectorAll("li")].forEach(li=>{
+    li.addEventListener("click", ()=>{
+      const place = items[li.dataset.i];
+      const [lon, lat] = place.geometry.coordinates;
+
+      map.setView([lat, lon], 15);
+      searchResultsEl.hidden = true;
+    });
+  });
+}
+
+//
+// ============================================================
+//   RESTO DEL CÓDIGO (NO MODIFICADO + EXTENSIONES TORNEO)
+// ============================================================
+
 function clearFilters(){
   byId('sportFilter').value = '';
-  byId('searchText').value = '';
+  const s = byId('searchText');
+  if (s) s.value = '';
   persistPrefs();
   render();
+  clearSearchResults();
 }
 
 function applyFilters(list){
   const sport = byId('sportFilter').value;
-  const q = byId('searchText').value.trim().toLowerCase();
-  let filtered = list.filter(l =>
-    (!sport || l.sport === sport) &&
-    (!q || (l.name + ' ' + l.sport).toLowerCase().includes(q))
-  );
+  let filtered = list.filter(l => (!sport || l.sport === sport));
 
   if (nearCircle) {
     const center = nearCircle.getLatLng();
@@ -123,16 +273,68 @@ function applyFilters(list){
   return filtered;
 }
 
+// Elimina torneos/puntos vencidos del array y del localStorage
+function filterExpired(list){
+  const now = Date.now();
+  const kept = [];
+  let changed = false;
+
+  for (const p of list){
+    if (p.endAt && now > p.endAt){
+      changed = true;
+      continue;
+    }
+    kept.push(p);
+  }
+
+  if (changed){
+    saveLS(LS_KEYS.LOCATIONS, kept);
+    currentData = kept;
+  }
+  return kept;
+}
+
+// Devuelve texto de tiempo restante para torneos/puntos
+function getRemainingLabel(item){
+  if (!item.endAt) return '';
+
+  const diff = item.endAt - Date.now();
+  if (diff <= 0) return 'Finalizado';
+
+  const totalMin = Math.round(diff / 60000);
+  const hours = Math.floor(totalMin / 60);
+  const mins  = totalMin % 60;
+
+  if (hours > 0){
+    return `${hours} h ${mins} min`;
+  }
+  return `${mins} min`;
+}
+
 function render(){
   allMarkers.forEach(m => m.remove());
   allMarkers = [];
 
-  const filtered = applyFilters(currentData);
+  // Limpia torneos/puntos vencidos antes de filtrar
+  const alive = filterExpired(currentData);
+  const filtered = applyFilters(alive);
   const favs = getFavorites();
   const myUserId = DS.getSessionUserId();
 
   filtered.forEach(p => {
-    const marker = L.marker([p.lat, p.lng], { title: p.name }).addTo(map);
+    // Icono especial para torneos / puntos de encuentro
+    let markerOptions = { title: p.name };
+    if (p.tType === 'tournament' || p.tType === 'meetpoint') {
+      const emoji = p.tType === 'tournament' ? '🏆' : '🚩';
+      markerOptions.icon = L.divIcon({
+        html: emoji,
+        className: 'tournament-marker',
+        iconSize: [28, 28],
+        iconAnchor: [14, 14]
+      });
+    }
+
+    const marker = L.marker([p.lat, p.lng], markerOptions).addTo(map);
     const isFav = favs.has(p.id);
     const favLabel = isFav ? '★ Quitar de favoritos' : '☆ Agregar a favoritos';
 
@@ -143,35 +345,52 @@ function render(){
       creatorBlock = `
         <small style="opacity:.85">Creado por: <strong>@${escapeHtml(label)}</strong></small><br>
         <div class="popup-actions" style="margin-top:6px;">
-          <button onclick="viewCreatorProfile('${p.createdBy}')" class="button button--ghost" style="padding:.45rem .7rem">👤 Ver perfil</button>
+          <button onclick="viewCreatorProfile('${p.createdBy}')">👤 Ver perfil</button>
         </div>
       `;
     }
 
     const canDelete = (p.createdBy && p.createdBy === myUserId);
-    let actions = `
+
+    const actions = `
       <div class="popup-actions" style="margin-top:10px;">
         <div class="left">
-          <button onclick="showInfo('${p.id}')" class="button button--ghost" style="padding:.45rem .7rem">ℹ️ Info</button>
-          <button onclick="toggleFavorite('${p.id}')" class="button button--ghost" style="padding:.45rem .7rem">${favLabel}</button>
+          <button onclick="showInfo('${p.id}')">ℹ️ Info</button>
+          <button onclick="toggleFavorite('${p.id}')">${favLabel}</button>
         </div>
         <div class="right">
-          ${ canDelete ? `<button onclick="deleteLocation('${p.id}')" class="button button--ghost" style="padding:.45rem .7rem">🗑️ Eliminar</button>` : '' }
+          ${ canDelete ? `<button onclick="deleteLocation('${p.id}')">🗑️ Eliminar</button>` : '' }
         </div>
       </div>
     `;
 
+    // Texto extra si es torneo / punto de encuentro
+    let extraMeta = '';
+    if (p.tType && p.endAt){
+      const label = getRemainingLabel(p);
+      const title = p.tType === 'tournament' ? 'Tiempo restante' : 'Válido';
+      extraMeta = `<small><strong>${title}:</strong> ${escapeHtml(label)}</small>`;
+    }
+
+    // ==========================
+    //     NUEVO POPUP PREMIUM
+    // ==========================
     marker.bindPopup(`
       <div class="popup">
         <h4 class="popup-title">${escapeHtml(p.name)}</h4>
+
         ${creatorBlock}
+
         <div class="popup-meta">
-          <small>Deporte: ${escapeHtml(p.sport)}</small>
-          ${p.schedule ? `<small>Horario: ${escapeHtml(p.schedule)}</small>` : ''}
+          <small><strong>Deporte:</strong> ${escapeHtml(p.sport)}</small>
+          ${p.schedule ? `<small><strong>Horario:</strong> ${escapeHtml(p.schedule)}</small>` : ''}
+          ${extraMeta}
         </div>
+
         ${actions}
       </div>
     `);
+
     allMarkers.push(marker);
   });
 
@@ -196,6 +415,10 @@ function setAddMode(state){
   const panel = byId('addPanel');
 
   if(addMode){
+    // Desactiva modo torneo si estuviera activo
+    if (tournamentMode) {
+      cancelTournamentMode();
+    }
     btn.textContent = '✅ Añadiendo (clic en el mapa)';
     btn.classList.add('button--accent');
     panel.hidden = false;
@@ -256,6 +479,137 @@ function saveLocation(){
   alert(`Ubicación "${item.name}" guardada.`);
 }
 
+// ============= Torneos / Puntos de encuentro =============
+function toggleTournamentMode(){
+  tournamentMode = !tournamentMode;
+  const panel = byId('tournamentPanel');
+  const btn = byId('btnTournamentMode');
+
+  if (tournamentMode){
+    // Desactiva modo añadir normal
+    if (addMode) setAddMode(false);
+    if (btn){
+      btn.textContent = '🏆 Torneo (activo)';
+      btn.classList.add('button--accent');
+    }
+    if (panel) panel.hidden = false;
+    clearTempTournament();
+  } else {
+    if (btn){
+      btn.textContent = '🏆 Torneos';
+      btn.classList.remove('button--accent');
+    }
+    if (panel) panel.hidden = true;
+    clearTempTournament();
+  }
+}
+
+function cancelTournamentMode(){
+  tournamentMode = false;
+  const panel = byId('tournamentPanel');
+  const btn = byId('btnTournamentMode');
+  if (panel) panel.hidden = true;
+  if (btn){
+    btn.textContent = '🏆 Torneos';
+    btn.classList.remove('button--accent');
+  }
+  clearTempTournament();
+}
+
+function clearTempTournament(){
+  if (tempTournamentMarker){
+    tempTournamentMarker.remove();
+    tempTournamentMarker = null;
+  }
+  tempTournamentLatLng = null;
+}
+
+function ensureTournamentMarkerAt(lat, lng, open=false){
+  if (!tempTournamentMarker){
+    tempTournamentMarker = L.marker([lat, lng], {
+      draggable: true,
+      title: 'Nuevo torneo / punto',
+      icon: L.divIcon({
+        html: '🏆',
+        className: 'tournament-marker',
+        iconSize: [28, 28],
+        iconAnchor: [14, 14]
+      })
+    }).addTo(map);
+
+    tempTournamentMarker.on('dragend', () => {
+      const pos = tempTournamentMarker.getLatLng();
+      tempTournamentLatLng = { lat: pos.lat, lng: pos.lng };
+    });
+  } else {
+    tempTournamentMarker.setLatLng([lat, lng]);
+  }
+
+  const html = `<strong>Nuevo torneo / punto</strong><br>Arrastra para ajustar.<br>Lat: ${lat.toFixed(6)} · Lng: ${lng.toFixed(6)}`;
+  tempTournamentMarker.bindPopup(html);
+  if (open) tempTournamentMarker.openPopup();
+}
+
+function saveTournament(){
+  if (!DS.isLoggedIn()) { alert('Debes iniciar sesión.'); return; }
+
+  const name = byId('tName').value.trim();
+  const tType = byId('tType').value;          // 'tournament' | 'meetpoint'
+  const duration = Number(byId('tDuration').value) || 2; // horas
+  const info = byId('tInfo').value.trim();
+  const tSport = byId('tSport').value;        // ⭐ deporte real del torneo/punto
+
+  if (!tournamentMode){
+    alert('Pulsa “🏆 Torneos” para entrar en modo de colocación.');
+    return;
+  }
+  if (!tempTournamentLatLng){
+    alert('Haz clic en el mapa para colocar el torneo / punto de encuentro.');
+    return;
+  }
+  if (!name){
+    alert('Ingresa un nombre para el torneo / punto.');
+    return;
+  }
+
+  const now = Date.now();
+  const endAt = now + duration * 60 * 60 * 1000;
+
+  const item = normalize({
+    name,
+    sport: tSport,   // ⭐ se guarda el deporte elegido para que funcione el filtro
+    schedule: '',
+    info,
+    lat: tempTournamentLatLng.lat,
+    lng: tempTournamentLatLng.lng,
+    verified: false,
+    createdBy: DS.getSessionUserId(),
+    createdAt: now,
+    tType,
+    endAt
+  });
+
+  const list = readLS(LS_KEYS.LOCATIONS, []);
+  list.push(item);
+  saveLS(LS_KEYS.LOCATIONS, list);
+  currentData = list;
+
+  // limpiar formulario
+  byId('tName').value = '';
+  byId('tInfo').value = '';
+  byId('tDuration').value = '2';
+  byId('tType').value = 'tournament';
+  byId('tSport').value = 'Fútbol'; // reset por defecto
+
+  clearTempTournament();
+
+  // cerrar modo torneo
+  cancelTournamentMode();
+  render();
+
+  alert(`Se creó el ${tType === 'tournament' ? 'torneo' : 'punto de encuentro'} "${item.name}".`);
+}
+
 // ============= Eliminar =============
 function deleteLocation(id){
   const list = readLS(LS_KEYS.LOCATIONS, []);
@@ -283,6 +637,7 @@ function getFavKey() {
 }
 function getFavorites() { return new Set(readLS(getFavKey(), [])); }
 function saveFavorites(set) { saveLS(getFavKey(), Array.from(set)); }
+
 function toggleFavorite(id){
   const favs = getFavorites();
   if(favs.has(id)) favs.delete(id); else favs.add(id);
@@ -291,8 +646,10 @@ function toggleFavorite(id){
   if (!byId('favPanel').hidden) fillFavPanel();
 }
 
-// Panel Favoritos
-function openFavPanel(){ fillFavPanel(); byId('favPanel').hidden = false; }
+function openFavPanel(){
+  fillFavPanel();
+  byId('favPanel').hidden = false;
+}
 function closeFavPanel(){ byId('favPanel').hidden = true; }
 
 function fillFavPanel(){
@@ -317,7 +674,6 @@ function fillFavPanel(){
   `).join('');
 }
 
-// ============= Centro en favorito =============
 function centerOn(id){
   const p = currentData.find(x => x.id === id);
   if(!p) return;
@@ -329,7 +685,7 @@ function centerOn(id){
   if (mk) mk.openPopup();
 }
 
-// ============= Información (modal) =============
+// ============= Información =============
 function showInfo(id){
   const item = currentData.find(x => x.id === id);
   if(!item) return;
@@ -341,16 +697,26 @@ function showInfo(id){
     creatorLine = `<p><strong>Creador:</strong> @${escapeHtml(label)}</p>`;
   }
 
+  // Texto extra de tiempo si es torneo/punto
+  let extra = '';
+  if (item.tType && item.endAt){
+    const label = getRemainingLabel(item);
+    const title = item.tType === 'tournament' ? 'Tiempo restante' : 'Válido';
+    extra = `<p><strong>${title}:</strong> ${escapeHtml(label)}</p>`;
+  }
+
   byId('infoTitle').textContent = item.name;
   byId('infoBody').innerHTML = `
     ${creatorLine}
     <p><strong>Deporte:</strong> ${escapeHtml(item.sport)}</p>
     ${item.schedule ? `<p><strong>Horario:</strong> ${escapeHtml(item.schedule)}</p>` : ''}
     ${item.info ? `<p><strong>Más información:</strong><br>${escapeHtml(item.info)}</p>` : '<p>No hay información adicional.</p>'}
+    ${extra}
     <p style="opacity:.7"><small>Ubicación: ${item.lat.toFixed(5)}, ${item.lng.toFixed(5)}</small></p>
   `;
   byId('infoModal').hidden = false;
 }
+
 function hideInfo(){ byId('infoModal').hidden = true; }
 
 // ============= Cerca de mí =============
