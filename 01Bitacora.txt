@@ -1,72 +1,92 @@
-Bitacora de desarrollo – Proyecto Deporte Conecta
-Fecha: 29 de octubre de 2025
-Desarrollador: Sebastian Garcia Cruz
-Proyecto: Deporte Conecta – Plataforma colaborativa de conexion deportiva
+# BITÁCORA DE AVANCES – PROYECTO DEPORTE CONECTA
 
-Avances implementados para esta entrega:
+Estado del proyecto: Prototipo funcional finalizado
 
-Durante esta fase se consolidaron mejoras clave en la funcionalidad multiusuario, 
-la gestion individual de datos y la experiencia de interaccion dentro del mapa. 
-Se optimizo el flujo de sesion y se ajustaron detalles visuales para mantener coherencia con el 
-nuevo diseño implementado previamente.
+---
 
-Principales mejoras realizadas:
+##" 1. Mejoras visuales implementadas
 
-1. Sistema de favoritos individual por usuario
-   Se modifico la logica de almacenamiento de favoritos en el mapa, creando una clave unica por 
-   usuario (dc_favorites_userId).
-   Esto permite que cada usuario tenga su propia lista de lugares marcados sin interferir con los 
-   demas perfiles.
-   La informacion de favoritos se sincroniza dinamicamente al iniciar sesion y se actualiza en 
-   tiempo real dentro del panel lateral.
+Durante esta fase se realizaron actualizaciones enfocadas en mejorar la experiencia visual y la consistencia entre todos los módulos.
 
-2. Mejoras en el panel "Cerca de mi"
-   Se anadio un boton para seleccionar manualmente el punto central de busqueda en el mapa.
-   Se reorganizo la interfaz del panel para que la configuracion de ubicacion y radio de busqueda 
-   sea mas clara e intuitiva.
-   Se mantiene el soporte para geolocalizacion automatica mediante la API navigator.geolocation.
+* Se rediseñó por completo el módulo de inicio de sesión y registro, con un color de fondo más oscuro, tipografías más limpias y un estilo más profesional.
+* Se ajustó el menú principal para hacerlo más ordenado y moderno.
+* El mapa recibió mejoras visuales: panel superior con efecto tipo “glass”, popups más limpios y paneles laterales más uniformes.
+* Se eliminaron elementos visuales innecesarios, como botones fuera de lugar.
+* Se unificó la paleta de colores entre las pantallas principales.
 
-3. Control de sesion y seguridad visual
-   Se fortalecio la validacion de sesion para impedir el acceso directo a map.html sin estar autenticado.
-   Se incorporaron controles visuales que identifican correctamente al creador de cada ubicacion.
-   Solo el usuario que registro una ubicacion puede eliminarla.
+---
 
-4. Integracion del apartado de perfil
-   Se preparo la funcion viewCreatorProfile para dirigir al perfil del usuario actual y dejar la 
-   estructura lista para futuros perfiles publicos.
-   Se establecio la base para conectar esta vista con un archivo profile.html editable.
+## 2. Sistema de torneos y puntos de encuentro
 
-5. Mantenimiento de codigo y coherencia general
-   Se corrigieron duplicaciones de variables y se refactorizo la gestion de marcadores temporales 
-   y circulos del mapa.
-   Se mantuvo la compatibilidad entre paneles, modales y configuraciones previas sin romper el flujo 
-   actual.
+Se añadió un sistema completo para crear eventos temporales dentro del mapa.
 
-Objetivos en proceso para el siguiente avance – Fase comunidad y perfiles:
+* Se agregó un botón llamado "Torneos" en el panel superior.
+* Se creó un panel exclusivo para añadir torneos y puntos de encuentro.
+* El usuario puede colocar el evento directamente en el mapa.
+* Los torneos se representan con un ícono de trofeo (🏆).
+* Los puntos de encuentro se representan con una bandera (🚩).
+* El usuario puede elegir duración del evento (2 a 5 horas).
+* El creador puede eliminar su evento en cualquier momento.
+* Todos los eventos muestran el tiempo restante o el tiempo válido.
+* El sistema elimina automáticamente los torneos o puntos que ya finalizaron.
+* Todos los torneos pueden seleccionarse por deporte, y respetan los filtros de deporte del mapa.
 
-En la proxima fase se trabajara en fortalecer el componente social de la aplicacion, centrado en la 
-gestion de perfiles y la futura ventana de comunidad. El objetivo es que los usuarios puedan interactuar 
-mas entre ellos, compartir intereses y descubrir otros deportistas cercanos.
+---
 
-Objetivo general:
-Desarrollar el apartado de comunidad y los perfiles de usuario, permitiendo que cada persona tenga una 
-identidad visible dentro de la plataforma y pueda conectar con otros usuarios activos.
+## 3. Integración con filtros de deporte
 
-Objetivos especificos:
+Los torneos y puntos de encuentro ahora se pueden clasificar por deporte, lo que permite:
 
-1. Completar la vista de perfil (profile.html) con edicion de datos, avatar, biografia y deportes favoritos.
-2. Implementar una vista de perfil publico (user.html) accesible desde el mapa al consultar el creador de una ubicacion.
-3. Diseñar la ventana de comunidad con una lista de usuarios activos, buscador y filtros por deporte.
-4. Incluir la opcion de seguir a otros usuarios o guardar contactos deportivos.
-5. Preparar la estructura para futuras funciones de chat y eventos entre usuarios.
+* Ver únicamente los torneos del deporte seleccionado.
+* Ocultar los que no correspondan al filtro.
+* Mantener coherencia con el sistema de lugares deportivos ya existente.
 
-Impacto esperado del siguiente avance:
-La integracion del modulo de comunidad y los perfiles personalizados dara a Deporte Conecta una dimension 
-social, transformandola en una red deportiva local donde los usuarios no solo comparten ubicaciones sino 
-tambien experiencias. Esto sentara la base para la proxima etapa del proyecto, centrada en interaccion y 
-colaboracion entre deportistas.
+---
 
-Conclusion:
-Con este avance, Deporte Conecta refuerza su identidad como plataforma participativa, incorporando 
-elementos de personalizacion y gestion de usuarios. El siguiente paso sera ampliar la funcionalidad 
-de perfiles y comunidad, fortaleciendo el sentido de pertenencia y colaboracion dentro de la aplicacion.
+## 4. Mejoras generales en el mapa
+
+Se mejoró la usabilidad del mapa en varios aspectos:
+
+* El buscador ahora usa la API Photon, ofreciendo resultados reales y autocompletado.
+* El panel de favoritos tiene un diseño más claro y fácil de usar.
+* El módulo "Cerca de mí" ahora muestra el radio de búsqueda correctamente y permite seleccionar manualmente el centro.
+* Los marcadores temporales y normales se gestionan con más claridad.
+
+---
+
+## 5. Calidad del código y estructura
+
+El código del proyecto fue reorganizado para hacerlo más claro y fácil de mantener.
+
+* Se dividieron mejor las funciones para añadir lugares, añadir torneos, favoritos, filtros y búsqueda.
+* Se unificó la normalización de datos mediante una función que organiza toda la información de cada lugar.
+* Se dejaron preparadas estructuras que permiten integrar backend real en el futuro.
+* Los modos de interacción (Añadir, Torneos, Cerca de mí) funcionan de manera independiente sin interferirse.
+
+---
+
+## 6. Estado final del prototipo
+
+El prototipo incluye todas las funciones necesarias para ser evaluado:
+
+* Inicio de sesión
+* Registro
+* Perfil
+* Mapa interactivo
+* Filtros por deporte
+* Búsqueda real de lugares
+* Favoritos
+* Función Cerca de mí
+* Añadir lugares reales
+* Añadir torneos y puntos de encuentro
+* Eventos temporales con expiración automática
+* Eliminación solo por parte del creador
+* Popups de información mejorados
+* Interfaz moderna y funcional
+
+---
+
+## Conclusión
+
+El proyecto Deporte Conecta finaliza su etapa de prototipo con un sistema funcional, fácil de usar, visualmente moderno y preparado para futuros crecimientos.
+Todas las características principales están operativas y permiten mostrar de manera clara el potencial del proyecto.
