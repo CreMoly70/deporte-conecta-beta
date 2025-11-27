@@ -6,11 +6,14 @@ Estado del proyecto: Prototipo funcional finalizado
 
 ##" 1. Mejoras visuales implementadas
 
-Durante esta fase se realizaron actualizaciones enfocadas en mejorar la experiencia visual y la consistencia entre todos los módulos.
+Durante esta fase se realizaron actualizaciones enfocadas en mejorar la experiencia visual y
+la consistencia entre todos los módulos.
 
-* Se rediseñó por completo el módulo de inicio de sesión y registro, con un color de fondo más oscuro, tipografías más limpias y un estilo más profesional.
+* Se rediseñó por completo el módulo de inicio de sesión y registro, con un color de fondo más 
+oscuro, tipografías más limpias y un estilo más profesional.
 * Se ajustó el menú principal para hacerlo más ordenado y moderno.
-* El mapa recibió mejoras visuales: panel superior con efecto tipo “glass”, popups más limpios y paneles laterales más uniformes.
+* El mapa recibió mejoras visuales: panel superior con efecto tipo “glass”, popups más limpios 
+y paneles laterales más uniformes.
 * Se eliminaron elementos visuales innecesarios, como botones fuera de lugar.
 * Se unificó la paleta de colores entre las pantallas principales.
 
@@ -49,7 +52,8 @@ Se mejoró la usabilidad del mapa en varios aspectos:
 
 * El buscador ahora usa la API Photon, ofreciendo resultados reales y autocompletado.
 * El panel de favoritos tiene un diseño más claro y fácil de usar.
-* El módulo "Cerca de mí" ahora muestra el radio de búsqueda correctamente y permite seleccionar manualmente el centro.
+* El módulo "Cerca de mí" ahora muestra el radio de búsqueda correctamente y permite 
+seleccionar manualmente el centro.
 * Los marcadores temporales y normales se gestionan con más claridad.
 
 ---
@@ -58,10 +62,13 @@ Se mejoró la usabilidad del mapa en varios aspectos:
 
 El código del proyecto fue reorganizado para hacerlo más claro y fácil de mantener.
 
-* Se dividieron mejor las funciones para añadir lugares, añadir torneos, favoritos, filtros y búsqueda.
-* Se unificó la normalización de datos mediante una función que organiza toda la información de cada lugar.
+* Se dividieron mejor las funciones para añadir lugares, añadir torneos, 
+favoritos, filtros y búsqueda.
+* Se unificó la normalización de datos mediante una función que organiza toda la 
+información de cada lugar.
 * Se dejaron preparadas estructuras que permiten integrar backend real en el futuro.
-* Los modos de interacción (Añadir, Torneos, Cerca de mí) funcionan de manera independiente sin interferirse.
+* Los modos de interacción (Añadir, Torneos, Cerca de mí) funcionan de manera 
+independiente sin interferirse.
 
 ---
 
@@ -84,9 +91,28 @@ El prototipo incluye todas las funciones necesarias para ser evaluado:
 * Popups de información mejorados
 * Interfaz moderna y funcional
 
+7. Sistema de chat privado y ampliación de deportes
+
+- Durante esta fase se integró un módulo de mensajería privada entre usuarios, 
+totalmente funcional dentro del prototipo.
+- Se añadió el módulo de chats con lista de conversaciones.
+- Cada usuario puede iniciar un chat desde el perfil público de otro usuario.
+- Los mensajes se guardan por usuario y se actualizan automáticamente en pantalla.
+- El sistema marca los mensajes como leídos al abrir la conversación.
+- Se rediseñó la interfaz del chat para que los mensajes enviados y recibidos se vean de forma clara.
+- El chat mantiene coherencia visual con el resto de módulos.
+
+Además, se ampliaron los deportes disponibles:
+- Se agregaron crossfit, senderismo y fútbol de salón.
+- Estos deportes ya aparecen en filtros, formularios para añadir lugares y en torneos y 
+puntos de encuentro.
+- Se integran correctamente en perfiles y en el almacenamiento interno del sistema.
+
 ---
 
 ## Conclusión
 
-El proyecto Deporte Conecta finaliza su etapa de prototipo con un sistema funcional, fácil de usar, visualmente moderno y preparado para futuros crecimientos.
-Todas las características principales están operativas y permiten mostrar de manera clara el potencial del proyecto.
+El proyecto Deporte Conecta finaliza su etapa de prototipo con un sistema funcional, 
+fácil de usar, visualmente moderno y preparado para futuros crecimientos.
+Todas las características principales están operativas y permiten mostrar de manera 
+clara el potencial del proyecto.
