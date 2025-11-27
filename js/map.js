@@ -160,7 +160,6 @@ function escapeHtml(str){
   }[s]));
 }
 
-//
 // ============================================================
 //   AUTOCOMPLETADO REAL PHOTON API (FUNCIONA DE VERDAD)
 // ============================================================
@@ -247,7 +246,6 @@ function renderSearchResults(items){
   });
 }
 
-//
 // ============================================================
 //   RESTO DEL CÓDIGO (NO MODIFICADO + EXTENSIONES TORNEO)
 // ============================================================
@@ -372,9 +370,6 @@ function render(){
       extraMeta = `<small><strong>${title}:</strong> ${escapeHtml(label)}</small>`;
     }
 
-    // ==========================
-    //     NUEVO POPUP PREMIUM
-    // ==========================
     marker.bindPopup(`
       <div class="popup">
         <h4 class="popup-title">${escapeHtml(p.name)}</h4>
@@ -415,7 +410,6 @@ function setAddMode(state){
   const panel = byId('addPanel');
 
   if(addMode){
-    // Desactiva modo torneo si estuviera activo
     if (tournamentMode) {
       cancelTournamentMode();
     }
@@ -486,7 +480,6 @@ function toggleTournamentMode(){
   const btn = byId('btnTournamentMode');
 
   if (tournamentMode){
-    // Desactiva modo añadir normal
     if (addMode) setAddMode(false);
     if (btn){
       btn.textContent = '🏆 Torneo (activo)';
@@ -554,10 +547,10 @@ function saveTournament(){
   if (!DS.isLoggedIn()) { alert('Debes iniciar sesión.'); return; }
 
   const name = byId('tName').value.trim();
-  const tType = byId('tType').value;          // 'tournament' | 'meetpoint'
-  const duration = Number(byId('tDuration').value) || 2; // horas
+  const tType = byId('tType').value;
+  const duration = Number(byId('tDuration').value) || 2;
   const info = byId('tInfo').value.trim();
-  const tSport = byId('tSport').value;        // ⭐ deporte real del torneo/punto
+  const tSport = byId('tSport').value;
 
   if (!tournamentMode){
     alert('Pulsa “🏆 Torneos” para entrar en modo de colocación.');
@@ -577,7 +570,7 @@ function saveTournament(){
 
   const item = normalize({
     name,
-    sport: tSport,   // ⭐ se guarda el deporte elegido para que funcione el filtro
+    sport: tSport,
     schedule: '',
     info,
     lat: tempTournamentLatLng.lat,
@@ -594,16 +587,14 @@ function saveTournament(){
   saveLS(LS_KEYS.LOCATIONS, list);
   currentData = list;
 
-  // limpiar formulario
   byId('tName').value = '';
   byId('tInfo').value = '';
   byId('tDuration').value = '2';
   byId('tType').value = 'tournament';
-  byId('tSport').value = 'Fútbol'; // reset por defecto
+  byId('tSport').value = 'Fútbol';
 
   clearTempTournament();
 
-  // cerrar modo torneo
   cancelTournamentMode();
   render();
 
@@ -697,7 +688,6 @@ function showInfo(id){
     creatorLine = `<p><strong>Creador:</strong> @${escapeHtml(label)}</p>`;
   }
 
-  // Texto extra de tiempo si es torneo/punto
   let extra = '';
   if (item.tType && item.endAt){
     const label = getRemainingLabel(item);
@@ -784,9 +774,13 @@ function startSelectNearCenter(){
 // --- Ver perfil creador ---
 function viewCreatorProfile(userId){
   const myId = DS.getSessionUserId();
+
+  // Si es mi propio perfil → perfil privado
   if (userId === myId){
     location.href = 'profile.html';
-  } else {
-    alert('Por ahora solo puedes ver tu propio perfil.');
+    return;
   }
+
+  // Si es otro usuario → perfil público
+  location.href = 'profile_public.html?id=' + encodeURIComponent(userId);
 }

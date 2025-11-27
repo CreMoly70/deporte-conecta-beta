@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deporte Conecta — Chat</title>
+
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/dataService.js"></script>
+
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #3b4cca, #7c5cff, #aa64ff);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Encabezado */
+    header {
+      padding: 14px 18px;
+      background: rgba(25, 30, 60, 0.65);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+      backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, .35);
+      z-index: 20;
+    }
+
+    header a {
+      color: white;
+      text-decoration: none;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    header strong {
+      font-size: 1.1rem;
+      flex-grow: 1;
+    }
+
+    /* Avatar del usuario */
+    #chatUserAvatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.15);
+    }
+
+    /* Caja del chat */
+    #chatMessages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 22px;
+      padding-bottom: 110px;
+      box-sizing: border-box;
+    }
+
+    /* Mensajes */
+    .msg {
+      max-width: 70%;
+      margin-bottom: 14px;
+      padding: 12px 16px;
+      border-radius: 14px;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+      animation: fadeIn .25s ease;
+      word-wrap: break-word;
+      font-size: 0.95rem;
+      line-height: 1.38;
+    }
+
+    .msg-me {
+      margin-left: auto;
+      background: linear-gradient(135deg, #6d5cff, #a36bff);
+      color: white;
+    }
+
+    .msg-other {
+      margin-right: auto;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: white;
+    }
+
+    .msg-time {
+      font-size: 0.7rem;
+      opacity: 0.7;
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Barra inferior */
+    .chat-input-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px;
+      background: rgba(15, 20, 40, 0.75);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(14px);
+      display: flex;
+      gap: 10px;
+      z-index: 40;
+    }
+
+    .chat-input-bar input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 0.95rem;
+    }
+
+    .chat-input-bar button {
+      padding: 12px 18px;
+      border-radius: 12px;
+      border: none;
+      background: rgba(255, 255, 255, 0.22);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .chat-input-bar button:hover {
+      background: rgba(255, 255, 255, 0.32);
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <header>
+    <a href="chat_list.html">⬅ Chats</a>
+    <strong id="chatUserName">Chat</strong>
+
+    <!-- avatar que no rompe si está vacío -->
+    <img id="chatUserAvatar" src="" alt="">
+  </header>
+
+  <!-- Área donde se muestran los mensajes -->
+  <main id="chatMessages"></main>
+
+  <!-- Barra de entrada -->
+  <div class="chat-input-bar">
+    <input type="text" id="msgInput" placeholder="Escribe un mensaje…">
+    <button id="btnSend">Enviar</button>
+  </div>
+
+  <script src="js/chat.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deporte Conecta — Perfil público</title>
+
+  <link rel="stylesheet" href="css/style.css"/>
+  <script src="js/dataService.js"></script>
+
+  <style>
+    body{
+      font-family:"Poppins",sans-serif;
+      background: linear-gradient(135deg,#3b4cca,#7c5cff,#aa64ff);
+      min-height:100vh;
+      padding-bottom:40px;
+      color:#fff;
+    }
+
+    .top-mini{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:14px 18px;
+      background:rgba(25,30,60,0.65);
+      border-bottom:1px solid rgba(255,255,255,0.22);
+      backdrop-filter:blur(16px);
+      box-shadow:0 8px 22px rgba(0,0,0,.35);
+    }
+
+    .top-mini a{
+      text-decoration:none;
+      color:white;
+      padding:8px 16px;
+      border-radius:12px;
+      background:rgba(255,255,255,0.18);
+      border:1px solid rgba(255,255,255,0.25);
+    }
+
+    .profile-wrap{
+      max-width:1150px;
+      margin:30px auto;
+      padding:10px;
+    }
+
+    .card{
+      background:rgba(255,255,255,0.10);
+      border:1px solid rgba(255,255,255,0.25);
+      border-radius:18px;
+      padding:22px;
+      box-shadow:0 12px 22px rgba(0,0,0,.35);
+      backdrop-filter:blur(16px);
+      margin-bottom:20px;
+    }
+
+    .avatar{
+      width:92px;
+      height:92px;
+      border-radius:18px;
+      object-fit:cover;
+      border:1px solid rgba(255,255,255,.25);
+      background:rgba(255,255,255,.08);
+      box-shadow:0 6px 14px rgba(0,0,0,.35);
+    }
+
+    .pill{
+      display:inline-block;
+      padding:.35rem .6rem;
+      border-radius:999px;
+      background:rgba(255,255,255,.15);
+      border:1px solid rgba(255,255,255,.23);
+      font-size:.85rem;
+      margin-right:6px;
+    }
+
+    .list{
+      display:grid;
+      gap:12px;
+      margin-top:16px;
+    }
+
+    .item{
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.06);
+      border-radius:12px;
+      padding:12px;
+    }
+
+    .item-actions button{
+      margin-top:6px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="top-mini">
+    <a href="map.html">⬅ Volver al mapa</a>
+    <strong>Perfil público</strong>
+  </header>
+
+  <main class="profile-wrap">
+
+    <article class="card" id="publicProfileCard">
+      <h2 id="ppName">Usuario</h2>
+      <p id="ppCity" style="opacity:.8">Ciudad</p>
+
+      <img id="ppAvatar" class="avatar" alt="Avatar">
+
+      <p id="ppBio" style="margin-top:12px; opacity:.9"></p>
+
+      <div id="ppSports" style="margin-top:10px"></div>
+
+      <button id="btnChat" class="button" style="margin-top:14px">Enviar mensaje</button>
+    </article>
+
+    <article class="card">
+      <h3>Ubicaciones creadas por este usuario</h3>
+
+      <div id="ppPlaces" class="list"></div>
+    </article>
+
+  </main>
+
+  <script src="js/profile_public.js"></script>
+
+</body>
+</html>

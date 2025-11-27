@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deporte Conecta — Mensajes</title>
+
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/dataService.js"></script>
+
+  <style>
+    body{
+      font-family:"Poppins",sans-serif;
+      background:linear-gradient(135deg,#3b4cca,#7c5cff,#aa64ff);
+      min-height:100vh;
+      margin:0;
+      padding:0;
+      color:#fff;
+      display:flex;
+      flex-direction:column;
+    }
+
+    header{
+      padding:14px 18px;
+      background:rgba(25,30,60,0.65);
+      border-bottom:1px solid rgba(255,255,255,0.22);
+      backdrop-filter:blur(16px);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      box-shadow:0 8px 22px rgba(0,0,0,.35);
+      z-index:10;
+    }
+
+    header .left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    header a{
+      color:white;
+      text-decoration:none;
+      padding:8px 16px;
+      background:rgba(255,255,255,0.18);
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.25);
+    }
+
+    header h1{
+      font-size:1.2rem;
+      margin:0;
+    }
+
+    header .badge-total{
+      padding:4px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.18);
+      border:1px solid rgba(255,255,255,0.25);
+      font-size:.8rem;
+    }
+
+    main{
+      flex:1;
+      display:flex;
+      justify-content:center;
+      padding:18px 12px 24px;
+      box-sizing:border-box;
+    }
+
+    .chat-list-wrap{
+      width:100%;
+      max-width:900px;
+    }
+
+    .chat-list-card{
+      background:rgba(18,22,40,0.9);
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,0.22);
+      box-shadow:0 16px 40px rgba(0,0,0,.4);
+      padding:14px;
+      backdrop-filter:blur(18px);
+    }
+
+    .chat-list-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:10px;
+    }
+
+    .chat-list-header h2{
+      margin:0;
+      font-size:1.1rem;
+    }
+
+    .chat-list{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      max-height:70vh;
+      overflow-y:auto;
+    }
+
+    .chat-row{
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      align-items:center;
+      gap:10px;
+      padding:10px 10px;
+      border-radius:14px;
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.13);
+      cursor:pointer;
+      transition:background .18s ease, transform .1s ease;
+    }
+
+    .chat-row:hover{
+      background:rgba(255,255,255,0.10);
+      transform:translateY(-1px);
+    }
+
+    .chat-avatar{
+      width:46px;
+      height:46px;
+      border-radius:14px;
+      object-fit:cover;
+      border:1px solid rgba(255,255,255,0.30);
+      background:rgba(255,255,255,0.18);
+    }
+
+    .chat-info{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      min-width:0;
+    }
+
+    .chat-name{
+      font-weight:600;
+      font-size:.98rem;
+      white-space:nowrap;
+      text-overflow:ellipsis;
+      overflow:hidden;
+    }
+
+    .chat-last{
+      font-size:.85rem;
+      opacity:.8;
+      white-space:nowrap;
+      text-overflow:ellipsis;
+      overflow:hidden;
+    }
+
+    .chat-meta{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:6px;
+      margin-left:6px;
+    }
+
+    .chat-time{
+      font-size:.75rem;
+      opacity:.75;
+    }
+
+    .unread-badge{
+      min-width:20px;
+      padding:2px 7px;
+      border-radius:999px;
+      font-size:.7rem;
+      font-weight:600;
+      text-align:center;
+      background:linear-gradient(135deg,#ffb36b,#ff7b7b);
+      color:#1a1320;
+      box-shadow:0 0 0 1px rgba(0,0,0,.25);
+    }
+
+    .chat-actions{
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .btn-delete-chat{
+      background:rgba(255,255,255,0.12);
+      border-radius:999px;
+      border:none;
+      width:30px;
+      height:30px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:white;
+      cursor:pointer;
+      font-size:0.9rem;
+    }
+
+    .btn-delete-chat:hover{
+      background:rgba(255,80,80,0.85);
+    }
+
+    .empty{
+      text-align:center;
+      padding:18px 4px;
+      opacity:.8;
+      font-size:.9rem;
+    }
+
+    @media(max-width:640px){
+      .chat-row{
+        grid-template-columns:auto 1fr auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="left">
+      <a href="map.html">⬅ Mapa</a>
+      <h1>Mensajes</h1>
+    </div>
+    <div id="totalUnread" class="badge-total" hidden>0 nuevos</div>
+  </header>
+
+  <main>
+    <section class="chat-list-wrap">
+      <div class="chat-list-card">
+        <div class="chat-list-header">
+          <h2>Chats recientes</h2>
+        </div>
+        <div id="chatList" class="chat-list">
+          <!-- chats se inyectan con JS -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/chat_list.js"></script>
+</body>
+</html>
